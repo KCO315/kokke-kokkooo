@@ -10,7 +10,7 @@ body {
   font-family: "Segoe UI", "Meiryo", sans-serif;
   margin: 0;
   height: 100vh;
-  background-color: #f9fdfc;
+  background-color: #f9fdfb;
   color: #333333;
   overflow: hidden;
 }
@@ -45,7 +45,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
-  background-color: #e0f2ec;
+  background-color: #c5ebdf;
   border-bottom: 1px solid #8ecbb9;
 }
 
@@ -58,7 +58,7 @@ body {
 .brand-icon-box {
   width: 32px;
   height: 32px;
-  background-color: #007b5e;
+  background-color: #328f74;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -77,7 +77,7 @@ body {
 .sticky-top {
   position: sticky;
   top: 0;
-  background-color: #a7e0cf;
+  background-color: #a6e0cf;
   z-index: 5;
   padding: 15px 15px 5px 15px;
 }
@@ -91,7 +91,7 @@ body {
 ========================================= */
 #activity-bar {
   width: 60px;
-  background-color: #a7e0cf;
+  background-color: #a6e0cf;
   border-right: 1px solid #8ecbb9;
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@ body {
 
 .activity-icon.active {
   background-color: #ffffff;
-  color: #007b5e;
+  color: #328f74;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
@@ -138,7 +138,7 @@ body {
 #content-area {
   flex: 1;
   position: relative;
-  background-color: #f9fdfc;
+  background-color: #f9fdfb;
 }
 
 iframe {
@@ -178,8 +178,8 @@ iframe {
 }
 
 .help-tab-btn.active {
-  color: #007b5e;
-  border-bottom-color: #007b5e;
+  color: #328f74;
+  border-bottom-color: #328f74;
 }
 
 .help-tab-btn:hover:not(.active) {
@@ -190,7 +190,7 @@ iframe {
 .help-tab-body {
   padding: 24px;
   overflow-y: auto;
-  background-color: #f9fdfc; /* 背景をテーマに合わせて少し調整 */
+  background-color: #f9fdfb; /* 背景をテーマに合わせて少し調整 */
   height: calc(100% - 53px);
 }
 
@@ -398,7 +398,7 @@ iframe {
 
 .tw-input:focus,
 .tw-select:focus {
-  border-color: #a7e0cf;
+  border-color: #a6e0cf;
   box-shadow: 0 0 0 3px rgba(167, 224, 207, 0.2);
 }
 
@@ -448,7 +448,7 @@ iframe {
 
 .tw-range {
   width: 100%;
-  accent-color: #007b5e;
+  accent-color: #328f74;
   height: 6px;
   border-radius: 3px;
   outline: none;
@@ -507,7 +507,7 @@ iframe {
 /* 以下は既存のコードそのまま */
 #csv-sidebar {
   width: 350px;
-  background-color: #a7e0cf;
+  background-color: #a6e0cf;
   border-right: 1px solid #8ecbb9;
   display: flex;
   flex-direction: column;
@@ -541,17 +541,17 @@ iframe {
 }
 
 .csv-btn-yellow {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
 }
 
 .csv-btn-yellow:hover {
-  background-color: #e2c00a;
+  background-color: #feb100;
   transform: translateY(-1px);
 }
 
 .csv-btn-green {
-  background-color: #007b5e;
+  background-color: #328f74;
   color: #fff;
 }
 
@@ -614,7 +614,7 @@ iframe {
 }
 
 .csv-check-item-active {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
   border-color: #dcb800;
   font-weight: bold;
@@ -642,8 +642,8 @@ iframe {
 }
 
 .csv-icon-btn:hover {
-  background-color: #f1cf0f;
-  border-color: #e2c00a;
+  background-color: #fece00;
+  border-color: #feb100;
   color: #333;
 }
 
@@ -660,7 +660,7 @@ iframe {
 }
 
 .csv-select:focus {
-  border-color: #007b5e;
+  border-color: #328f74;
 }
 
 .csv-accordion-btn {
@@ -681,7 +681,7 @@ iframe {
 }
 
 .csv-accordion-btn:hover {
-  color: #007b5e;
+  color: #328f74;
 }
 
 .csv-folder-delete-btn,
@@ -710,7 +710,7 @@ iframe {
 #csv-download-area {
   padding: 15px;
   border-top: 1px solid #8ecbb9;
-  background-color: #e0f2ec;
+  background-color: #c5ebdf;
   flex-shrink: 0;
 }
 
@@ -720,7 +720,7 @@ iframe {
   flex-direction: column;
   padding: 20px;
   overflow: hidden;
-  background-color: #f9fdfc;
+  background-color: #f9fdfb;
 }
 
 .csv-preview-container {
@@ -736,7 +736,7 @@ iframe {
 
 .csv-card {
   background-color: #ffffff;
-  border: 2px solid #a7e0cf;
+  border: 2px solid #a6e0cf;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -746,7 +746,7 @@ iframe {
 
 .csv-card-header {
   padding: 12px 15px;
-  background-color: #e0f2ec;
+  background-color: #c5ebdf;
   border-bottom: 1px solid #b0d4c8;
   font-weight: bold;
   color: #333;
@@ -799,7 +799,7 @@ iframe {
 }
 
 .csv-tree-item.active {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
   font-weight: bold;
   border-color: #dcb800;
@@ -810,7 +810,7 @@ iframe {
 ========================================= */
 #sidebar {
   width: 350px;
-  background-color: #a7e0cf;
+  background-color: #a6e0cf;
   border-right: 1px solid #8ecbb9;
   display: flex;
   flex-direction: column;
@@ -939,7 +939,7 @@ body.chromakey-mode #presentation-controls {
 
 #load-btn {
   padding: 12px;
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
   border: none;
   border-radius: 8px;
@@ -958,7 +958,7 @@ body.chromakey-mode #presentation-controls {
 }
 
 #load-btn:hover {
-  background-color: #e2c00a;
+  background-color: #feb100;
   transform: translateY(-1px);
 }
 
@@ -997,7 +997,7 @@ body.chromakey-mode #presentation-controls {
   margin-bottom: 10px;
   font-size: 13px;
   color: #444;
-  background-color: #e0f2ec;
+  background-color: #c5ebdf;
   padding: 8px 10px;
   border-bottom: 1px solid #b0d4c8;
   font-weight: bold;
@@ -1015,7 +1015,7 @@ body.chromakey-mode #presentation-controls {
 
 .group-number {
   display: inline-block;
-  background-color: #007b5e;
+  background-color: #328f74;
   color: #ffffff;
   font-size: 12px;
   padding: 2px 8px;
@@ -1027,7 +1027,7 @@ body.chromakey-mode #presentation-controls {
 
 .group-number-short {
   display: inline-block;
-  background-color: #007b5e;
+  background-color: #328f74;
   color: #ffffff;
   font-size: 10px;
   padding: 2px 6px;
@@ -1102,7 +1102,7 @@ body.chromakey-mode #presentation-controls {
 .list-item.active {
   background-color: rgba(241, 207, 15, 0.4);
   color: #333;
-  border-color: #f1cf0f;
+  border-color: #fece00;
   font-weight: normal;
   box-shadow: 0 2px 5px rgba(241, 207, 15, 0.4);
 }
@@ -1142,7 +1142,7 @@ body.chromakey-mode #presentation-controls {
 }
 
 .item-action:hover {
-  color: #007b5e;
+  color: #328f74;
 }
 
 #main {
@@ -1167,7 +1167,7 @@ body.chromakey-mode #presentation-controls {
   flex-wrap: wrap;
   position: sticky;
   top: 0;
-  background-color: #f9fdfc;
+  background-color: #f9fdfb;
   z-index: 90;
 }
 
@@ -1216,9 +1216,9 @@ select.control-btn {
 }
 
 .control-btn:hover {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
-  border-color: #e2c00a;
+  border-color: #feb100;
 }
 
 #activate-drawing-btn:hover {
@@ -1276,7 +1276,7 @@ select.control-btn {
 #volume-slider {
   width: 70px;
   cursor: pointer;
-  accent-color: #a7e0cf;
+  accent-color: #a6e0cf;
 }
 
 #presentation-wrapper {
@@ -1292,7 +1292,7 @@ select.control-btn {
   background-color: #ffffff;
   padding: 4px 12px;
   border-radius: 20px 20px 0 0;
-  border: 2px solid #a7e0cf;
+  border: 2px solid #a6e0cf;
   border-bottom: none;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
   margin-left: 20px;
@@ -1315,7 +1315,7 @@ select.control-btn {
 #zoom-controls-container #zoom-reset-btn {
   font-size: 12px;
   font-weight: bold;
-  color: #007b5e;
+  color: #328f74;
   padding: 4px 4px;
 }
 
@@ -1333,7 +1333,7 @@ select.control-btn {
   background-color: #ffffff;
   padding: 4px 12px;
   border-radius: 20px 20px 0 0;
-  border: 2px solid #a7e0cf;
+  border: 2px solid #a6e0cf;
   border-bottom: none;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
   font-size: 14px;
@@ -1395,7 +1395,7 @@ select.control-btn {
   border-radius: 50%;
   position: relative;
   margin-right: 8px;
-  background-color: #f9fdfc;
+  background-color: #f9fdfb;
 }
 
 .second-hand {
@@ -1418,7 +1418,7 @@ select.control-btn {
   max-height: 1080px;
   min-width: 320px;
   background-color: #ffffff;
-  border: 4px solid #a7e0cf;
+  border: 4px solid #a6e0cf;
   border-radius: 8px;
   display: block;
   resize: both;
@@ -1523,7 +1523,7 @@ select.control-btn {
 }
 
 .tool-btn.active-tool {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -1535,7 +1535,7 @@ select.control-btn {
 }
 
 .done-btn {
-  background-color: #007b5e;
+  background-color: #328f74;
   color: #fff;
   font-weight: bold;
   padding: 8px 12px;
@@ -1583,7 +1583,7 @@ body.chromakey-mode .text-preview-content {
   right: -36px;
   width: 36px;
   background-color: #ffffff;
-  border: 2px solid #a7e0cf;
+  border: 2px solid #a6e0cf;
   border-left: none;
   border-radius: 0 8px 8px 0;
   padding: 12px 0;
@@ -1600,7 +1600,7 @@ body.chromakey-mode .text-preview-content {
 }
 
 #external-link-btn:hover {
-  background-color: #f1cf0f;
+  background-color: #fece00;
   color: #333;
   border-color: #dcb800;
 }
@@ -1615,7 +1615,7 @@ body.chromakey-mode .text-preview-content {
 /* csv-tree-containerへのドラッグ＆ドロップ時エフェクト */
 #csv-tree-container.drag-over {
   background-color: #eaf8f4;
-  border: 2px dashed #007b5e;
+  border: 2px dashed #328f74;
   box-sizing: border-box;
 }
 
@@ -1630,7 +1630,7 @@ body.chromakey-mode .text-preview-content {
 }
 
 #csv-upload-dropzone.drag-over {
-  background-color: #e2c00a;
+  background-color: #feb100;
   transform: scale(1.02);
   border: 2px dashed #333;
 }
@@ -1641,7 +1641,7 @@ body.chromakey-mode .text-preview-content {
 }
 
 #load-btn.drag-over {
-  background-color: #e2c00a;
+  background-color: #feb100;
   transform: scale(1.02);
   border: 2px dashed #333;
 }
