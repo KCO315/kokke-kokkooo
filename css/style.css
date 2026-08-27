@@ -728,9 +728,10 @@ iframe {
   gap: 20px;
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow-x: auto; /* 横方向のみスクロールに変更 */
+  overflow-y: hidden;
   align-items: flex-start;
-  flex-wrap: wrap; /
+  flex-wrap: nowrap; /* wrap を nowrap に変更し、スラッシュを削除 */
 }
 
 .csv-card {
@@ -945,7 +946,6 @@ body.chromakey-mode #presentation-controls {
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
-  margin-bottom: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition:
     background-color 0.2s,

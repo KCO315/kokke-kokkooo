@@ -25,7 +25,7 @@
 				<div class="brand-icon-box">
 					<i data-lucide="monitor-play" style="width: 20px; height: 20px;"></i>
 				</div>
-				<span class="brand-title">配信モード <span style="font-size: 10px;">確認＆キャプチャー</span></span>
+				<span class="brand-title">配信モード <span style="font-size: 10px;">データプレビュー</span></span>
 			</div>
 			<button id="toggle-sidebar-btn" title="サイドバーを縮小する">
 				<i data-lucide="chevron-left" id="sidebar-chevron"></i>
@@ -46,6 +46,18 @@
 					<input type="file" id="folder-input" webkitdirectory directory
 						style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
 				</label>
+				<div style="text-align: center; margin: 10px; auto"><a target="_blank" style="color:
+						#007b5e; text-decoration: underline; word-break: break-all; font-size:0.8rem;"
+						href="https://drive.google.com/drive/folders/1i7oiM0AbUc0QzZSwjMOpLgAjXzQNjnMf?usp=drive_link">サンプルフォルダはこちら<svg
+							xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							data-lucide="external-link" style="width:16px;height:16px;"
+							class="lucide lucide-external-link">
+							<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+							<polyline points="15 3 21 3 21 9"></polyline>
+							<line x1="10" x2="21" y1="14" y2="3"></line>
+						</svg>
+					</a></div>
 
 				<h3 style="margin-bottom: 4px;">発表リスト</h3>
 				<p id="drag-hint-text"
@@ -140,19 +152,7 @@
 			<div id="presentation-area">
 				<div id="zoom-wrapper">
 					<div id="content-layer">
-						<p id="empty-message" style="color: #888;">ここに発表が表示されます<br>OBSでキャプチャーしてください<br><a
-								target="_blank" style="color:
-						#007b5e; text-decoration: underline; word-break: break-all; font-size:0.8rem;"
-								href="https://drive.google.com/drive/folders/1i7oiM0AbUc0QzZSwjMOpLgAjXzQNjnMf?usp=drive_link">サンプルフォルダはこちら(ダウンロードOK)<svg
-									xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-									fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-									stroke-linejoin="round" data-lucide="external-link" style="width:16px;height:16px;"
-									class="lucide lucide-external-link">
-									<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-									<polyline points="15 3 21 3 21 9"></polyline>
-									<line x1="10" x2="21" y1="14" y2="3"></line>
-								</svg>
-							</a></p>
+						<p id="empty-message" style="color: #888;">ここに発表が表示されます<br>OBSでキャプチャーしてください<br></p>
 					</div>
 					<canvas id="drawing-canvas"></canvas>
 				</div>

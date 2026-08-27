@@ -44,6 +44,13 @@
 					<span style="font-size: 11px; font-weight: normal;">(またはドラッグ＆ドロップ)</span>
 					<input type="file" id="csv-file" accept=".csv" class="hidden" />
 				</label>
+				<div style="text-align: center; margin-top: 10px;">
+					<a target="_blank"
+						style="color:#007b5e; text-decoration:underline; word-break:break-all; font-size:0.8rem;"
+						href="https://drive.google.com/file/d/1JoGCsHNYkgiG49YZDgzf6DhyTRbQ9clW/view?usp=sharing">サンプルCSVはこちら<i
+							data-lucide="external-link"
+							style="width:14px; height:14px; margin-left: 2px; vertical-align: middle;"></i></a>
+				</div>
 				<p id="csv-empty-hint" style="font-size: 13px; color: #555; margin: 12px 0 0 0; line-height: 1.4;">
 					CSVを読み込むと、ここに操作ボタンが表示されます
 				</p>
@@ -130,7 +137,7 @@
 
 		<div class="csv-preview-container">
 			<!-- 修正：style属性に max-width: 100%; と flex-shrink: 1; を設定 -->
-			<div class="csv-card" style="width: 1024px; max-width: 100%; height: 768px; flex-shrink: 1;">
+			<div class="csv-card" style="width: 1024px; max-width: 100%; height: 768px; flex-shrink: 0;">
 				<!-- 修正：ヘッダーを左右分割し、リセットボタンを追加 -->
 				<div class="csv-card-header" style="justify-content: space-between;">
 					<div style="display: flex; align-items: center; gap: 8px;">
@@ -144,11 +151,7 @@
 				</div>
 				<!-- 修正：contenteditable="true" とアウトライン無効化のスタイルを追加 -->
 				<div id="csv-preview-content" contenteditable="true" style="outline: none;">
-					左側のメニューからCSVファイルをアップロードしてください<br><a target="_blank"
-						style="color:#007b5e; text-decoration:underline; word-break:break-all; font-size:0.8rem;"
-						href="https://drive.google.com/file/d/1JoGCsHNYkgiG49YZDgzf6DhyTRbQ9clW/view?usp=sharing">サンプルCSVはこちら(ダウンロードOK)<i
-							data-lucide="external-link"
-							style="width:14px; height:14px; margin-left: 2px; vertical-align: middle;"></i></a></div>
+					左側のメニューからCSVファイルをアップロードしてください<br></div>
 			</div>
 			<!-- 修正：こちらも max-width: 100%; と flex-shrink: 1; を設定 -->
 			<div class="csv-card" style="width: 300px; max-width: 100%; height: 768px; flex-shrink: 1;">
