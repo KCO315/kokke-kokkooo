@@ -2,7 +2,12 @@
 let ytPlayer = null;
 let isYtApiReady = false;
 let audioCtx = null; // ★ Web Audio API用コンテキスト
-window.onYouTubeIframeAPIReady = function () { isYtApiReady = true; };
+
+if (window.YT && window.YT.Player) {
+	isYtApiReady = true;
+} else {
+	window.onYouTubeIframeAPIReady = function () { isYtApiReady = true; };
+}
 
 const folderInput = document.getElementById('folder-input');
 const loadBtn = document.getElementById('load-btn');

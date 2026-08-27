@@ -546,7 +546,7 @@ iframe {
 }
 
 .csv-btn-yellow:hover {
-  background-color: #feb100;
+  background-color: #ffd724;
   transform: translateY(-1px);
 }
 
@@ -643,7 +643,7 @@ iframe {
 
 .csv-icon-btn:hover {
   background-color: #fece00;
-  border-color: #feb100;
+  border-color: #ffd724;
   color: #333;
 }
 
@@ -958,7 +958,7 @@ body.chromakey-mode #presentation-controls {
 }
 
 #load-btn:hover {
-  background-color: #feb100;
+  background-color: #ffd724;
   transform: translateY(-1px);
 }
 
@@ -1218,7 +1218,7 @@ select.control-btn {
 .control-btn:hover {
   background-color: #fece00;
   color: #333;
-  border-color: #feb100;
+  border-color: #ffd724;
 }
 
 #activate-drawing-btn:hover {
@@ -1630,7 +1630,7 @@ body.chromakey-mode .text-preview-content {
 }
 
 #csv-upload-dropzone.drag-over {
-  background-color: #feb100;
+  background-color: #ffd724;
   transform: scale(1.02);
   border: 2px dashed #333;
 }
@@ -1641,7 +1641,7 @@ body.chromakey-mode .text-preview-content {
 }
 
 #load-btn.drag-over {
-  background-color: #feb100;
+  background-color: #ffd724;
   transform: scale(1.02);
   border: 2px dashed #333;
 }
