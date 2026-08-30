@@ -53,19 +53,21 @@ function updateMiniPreview() {
 			if (rulerHeight) rulerHeight.innerText = `${height}px`;
 			scale = containerWidth / width;
 		} else {
-			// AutoがOFFのとき、現在の設定サイズではなく「iframe側での実際の表示サイズ」を取得する
+			// AutoがOFFのとき、data-preview.html の input-width と input-height の値を取得する
 			let currentPreviewW = 1280;
 			let currentPreviewH = 720;
 			const framePreview = document.getElementById('frame-preview');
 			if (framePreview && framePreview.contentWindow) {
 				try {
-					// presentation-areaのボーダーを含まない純粋なコンテンツ領域のサイズ(clientWidth)を取得
-					const area = framePreview.contentWindow.document.getElementById('presentation-area');
-					if (area) {
-						currentPreviewW = area.clientWidth || parseInt(area.style.width) || 1280;
-						currentPreviewH = area.clientHeight || parseInt(area.style.height) || 720;
+					const inputW = framePreview.contentWindow.document.getElementById('input-width');
+					const inputH = framePreview.contentWindow.document.getElementById('input-height');
+					if (inputW && inputH) {
+						currentPreviewW = parseInt(inputW.value) || 1280;
+						currentPreviewH = parseInt(inputH.value) || 720;
 					}
-				} catch (e) { }
+				} catch (e) {
+					console.error("プレビューサイズの取得に失敗しました", e);
+				}
 			}
 
 			previewContainer.style.aspectRatio = `${currentPreviewW} / ${currentPreviewH}`;
