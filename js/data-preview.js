@@ -408,10 +408,10 @@ canvas.addEventListener('mousemove', (e) => {
 canvas.addEventListener('mouseup', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
 canvas.addEventListener('mouseout', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
 
-// ★ 音量最大200%対応（Web Audio API の GainNode と連動）
+// ★ 音量最大300%対応（Web Audio API の GainNode と連動）
 function applyVolume() {
-	const rawVol = parseFloat(volumeSlider.value); // 0.0 ~ 2.0
-	const actualVol = rawVol; // スライダーの値をそのまま音量とする（最大200%）
+	const rawVol = parseFloat(volumeSlider.value); // 0.0 ~ 3.0
+	const actualVol = rawVol; // スライダーの値をそのまま音量とする（最大300%）
 
 	const media = contentLayer.querySelector('video, audio');
 	if (media) {
@@ -844,7 +844,15 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 		}
 
 		showContent(file);
-		if (activeGroupName !== folderName) { activeGroupName = folderName; startTimer(); }
+		if (activeGroupName !== folderName) {
+			activeGroupName = folderName;
+			startTimer();
+			// グループ移動時に音量を初期値(100%)に戻す
+			volumeSlider.value = 1;
+			isMuted = false;
+			applyVolume();
+			updateVolumeIcon(1);
+		}
 	};
 
 	button.draggable = true;
