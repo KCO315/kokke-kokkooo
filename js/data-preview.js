@@ -934,6 +934,7 @@ function showContent(file) {
 	const fileName = file.name.toLowerCase();
 
 	if (fileName.match(/\.(mp4|mp3|wav|m4a)$/)) {
+		setControlsEnabled(true);
 		const isAudio = fileName.match(/\.(mp3|wav|m4a)$/);
 		const media = document.createElement(isAudio ? 'audio' : 'video');
 		media.src = fileURL;
@@ -972,7 +973,12 @@ function showContent(file) {
 
 		applyVolume();
 
-	} else if (fileName.match(/\.(pdf|html|htm)$/)) {
+	} else if (fileName.match(/\.(html|htm)$/)) {
+		setControlsEnabled(true);
+		const iframe = document.createElement('iframe'); iframe.src = fileURL; iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.style.border = 'none';
+		contentLayer.appendChild(iframe);
+	} else if (fileName.match(/\.pdf$/)) {
+		setControlsEnabled(false);
 		const iframe = document.createElement('iframe'); iframe.src = fileURL; iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.style.border = 'none';
 		contentLayer.appendChild(iframe);
 	} else if (fileName.endsWith('.txt')) {
@@ -983,6 +989,7 @@ function showContent(file) {
 			const ytMatch = text.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
 
 			if (ytMatch) {
+				setControlsEnabled(true);
 				externalLinkBtn.href = text; externalLinkBtn.style.display = 'flex';
 				const videoId = ytMatch[1];
 
@@ -1009,11 +1016,27 @@ function showContent(file) {
 			}
 
 			if (text.toLowerCase().startsWith('<iframe')) {
+				setControlsEnabled(true);
 				contentLayer.innerHTML = text; const iframe = contentLayer.querySelector('iframe');
 				if (iframe) { iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.style.border = 'none'; if (iframe.hasAttribute('allow')) iframe.setAttribute('allow', iframe.getAttribute('allow').replace(/autoplay;?\s*/i, '')); }
 			} else if (/^https?:\/\/\S+$/.test(text)) {
 				let iframeSrc = text;
 				const host = getHostFromUrl(text);
+
+				const driveFileMatch = text.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
+				if (driveFileMatch) {
+					setControlsEnabled(false);
+					const fileId = driveFileMatch[1];
+					iframeSrc = `https://drive.google.com/file/d/${fileId}/preview`;
+
+					contentLayer.innerHTML = `<div style="width:100%; height:100%; position:relative; background-color: #ffffff;"><iframe src="${iframeSrc}" style="width:100%; height:100%; border:none; display: block;" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`;
+
+					externalLinkBtn.href = text;
+					externalLinkBtn.style.display = 'flex';
+					return;
+				}
+
+				setControlsEnabled(true);
 
 				if (host === 'docs.google.com' && text.match(/\/(presentation|spreadsheets|document)\/d\//)) {
 					const typeMatch = text.match(/\/(presentation|spreadsheets|document)\/d\//);
@@ -1043,16 +1066,11 @@ function showContent(file) {
 				else if ((host === 'sharepoint.com' || host.endsWith('.sharepoint.com')) || (host === '1drv.ms' || host.endsWith('.1drv.ms'))) {
 					try { const urlObj = new URL(text); urlObj.searchParams.set('action', 'embedview'); urlObj.searchParams.set('wdAr', '1.7777777777777777'); iframeSrc = urlObj.toString(); } catch (e) { console.error(e); }
 				}
-				else if (host === 'drive.google.com' && text.includes('/open?id=')) {
-					try { const urlObj = new URL(text); const fileId = urlObj.searchParams.get('id'); if (fileId) { iframeSrc = `https://drive.google.com/file/d/${fileId}/preview`; } } catch (e) { console.error(e); }
-				}
-				else if (host === 'drive.google.com' && text.includes('/file/d/')) {
-					const match = text.match(/(https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+)/); if (match) { iframeSrc = `${match[1]}/preview`; }
-				}
 
 				contentLayer.innerHTML = `<div style="width:100%; height:100%; position:relative; background-color: #ffffff;"><iframe src="${iframeSrc}" style="width:100%; height:100%; border:none; display: block;" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`;
 				externalLinkBtn.href = text; externalLinkBtn.style.display = 'flex';
 			} else {
+				setControlsEnabled(false);
 				const pre = document.createElement('pre'); pre.className = 'text-preview-content'; pre.textContent = text; contentLayer.appendChild(pre);
 				if (fileName.startsWith('readme')) {
 					pre.style.fontSize = (globalSettings.readmeFontSize || 20) + 'px';
@@ -1067,12 +1085,15 @@ function showContent(file) {
 		};
 		reader.readAsText(file);
 	} else if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+		setControlsEnabled(false);
 		const img = document.createElement('img'); img.src = fileURL; contentLayer.appendChild(img);
 	} else if (fileName.match(/\.(pptx|ppt|xlsx|xls|docx|doc)$/)) {
+		setControlsEnabled(false);
 		const extMatch = file.name.match(/\.[^.]+$/); const fileExt = extMatch ? extMatch[0] : "";
 		contentLayer.innerHTML = `<div style="text-align: center; color: #888; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;"><i data-lucide="alert-circle" style="width:56px;height:56px; margin-bottom:12px; color:#e74c3c;"></i><p style="font-weight: bold; font-size: 18px; margin: 0; color: #555;">Officeファイルはプレビューできません</p><p style="font-size: 14px; margin-top: 8px; color: #666; line-height: 1.6;">左メニューの「指示コメ」を参照ください</strong></p><p style="font-size: 12px; margin-top: 15px; word-break: break-all; background: #f0f0f0; padding: 5px 10px; border-radius: 4px;">ファイル形式：${fileExt}</p></div>`;
 		lucide.createIcons({ root: contentLayer });
 	} else {
+		setControlsEnabled(false);
 		const extMatch = file.name.match(/\.[^.]+$/); const fileExt = extMatch ? extMatch[0] : "不明";
 		contentLayer.innerHTML = `<div style="text-align: center; color: #888; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;"><i data-lucide="alert-circle" style="width:56px;height:56px; margin-bottom:12px; color:#e74c3c;"></i><p style="font-weight: bold; font-size: 18px; margin: 0; color: #555;">このファイルはプレビューできません</p><p style="font-size: 14px; margin-top: 8px; color: #666; line-height: 1.6;">左メニューの「指示コメ」を参照ください</p><p style="font-size: 12px; margin-top: 15px; word-break: break-all; background: #f0f0f0; padding: 5px 10px; border-radius: 4px;">ファイル形式：${fileExt}</p></div>`;
 		lucide.createIcons({ root: contentLayer });
@@ -1100,5 +1121,21 @@ document.addEventListener('click', (e) => {
 		e.target.textContent = allGroupsCollapsed ? 'すべて開く' : 'すべて閉じる';
 	}
 });
+
+// コントローラーの有効化 / 無効化（グレーアウト）を制御する関数
+function setControlsEnabled(enabled) {
+	// メディア操作関連がまとまっているコンテナだけを取得
+	const volumeContainer = document.querySelector('.volume-container');
+
+	if (!volumeContainer) return;
+
+	if (enabled) {
+		// 動画・音声・YouTubeの場合は操作可能に
+		volumeContainer.classList.remove('control-disabled');
+	} else {
+		// それ以外（画像、テキスト、PDF、ドライブ動画等）はメディア操作部分のみグレーアウト
+		volumeContainer.classList.add('control-disabled');
+	}
+}
 
 lucide.createIcons();

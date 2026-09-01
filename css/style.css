@@ -1215,6 +1215,13 @@ body.chromakey-mode #presentation-controls {
   flex-wrap: wrap;
 }
 
+/* コントローラー要素の無効化（グレーアウト）用クラス */
+.control-disabled {
+  opacity: 0.4 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
 .panel-box {
   display: flex;
   align-items: center;
