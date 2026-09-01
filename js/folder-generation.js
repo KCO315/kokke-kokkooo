@@ -279,7 +279,22 @@ function processCsvTextAndExtractUrls(text, startIndex) {
 	const urlFormat = csvUrlFormatSelect ? csvUrlFormatSelect.value : 'number';
 
 	const replacedText = text.replace(urlRegex, (match) => {
-		const cleanUrl = match.replace(/[;；,，]+$/, ''); const trailing = match.substring(cleanUrl.length);
+		// ※ const を let に変更します
+		let cleanUrl = match.replace(/[;；,，]+$/, ''); const trailing = match.substring(cleanUrl.length);
+
+		// ▼ GoogleドライブURLのアクセス権エラー対策を追加 ▼
+		if (cleanUrl.includes('drive.google.com')) {
+			// 1. /u/0/ や /u/1/ などのアカウント強制指定パスを削除
+			cleanUrl = cleanUrl.replace(/\/u\/\d+\//, '/');
+
+			// 2. open?id=XXXX または open?usp=forms_web&id=XXXX の形式を標準的な file/d/XXXX/view に自動変換
+			// 正規表現を修正し、id= の直後の英数字を正しく抽出するようにしました
+			const driveIdMatch = cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
+			if (cleanUrl.includes('/open') && driveIdMatch) {
+				cleanUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/view`;
+			}
+		}
+
 		let domainStr = 'unknown';
 		try { const urlObj = new URL(cleanUrl); domainStr = urlObj.hostname.replace(/\./g, '-'); } catch (e) { }
 
