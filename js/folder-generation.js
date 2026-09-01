@@ -258,7 +258,7 @@ function updateCsvRowSelect() {
 		let title = generateCsvFolderName(row);
 		if (title.length > 15) title = title.substring(0, 15) + '...';
 		const tag = csvState.tags[i] || "";
-		const folderPrefix = tag ? `【${tag}】` : "";
+		const folderPrefix = tag ? `【#${tag}】` : "";
 		return `<option value="${i}">${folderPrefix}${String(i + 1).padStart(3, '0')} - ${title}</option>`;
 	}).join('');
 	csvRowSelect.value = csvState.currentIndex;
@@ -453,7 +453,7 @@ function updateCsvPreview() {
 
 	// カテゴリの反映
 	const tag = csvState.tags[csvState.currentIndex] || "";
-	const folderPrefix = tag ? `【${tag}】` : "";
+	const folderPrefix = tag ? `【#${tag}】` : "";
 	const numberPrefix = csvState.settings.useFolderNumber ? `${formattedRowNum}-` : "";
 	const folderPath = `${folderPrefix}${numberPrefix}${safeTitle}`;
 
@@ -710,7 +710,7 @@ csvDownloadBtn.addEventListener('click', async () => {
 		const safeTitle = folderTitle.replace(/[\\/:*?"<>|]/g, '_');
 
 		const tag = csvState.tags[index] || "";
-		const folderPrefix = tag ? `【${tag}】` : "";
+		const folderPrefix = tag ? `【#${tag}】` : "";
 		const numberPrefix = csvState.settings.useFolderNumber ? `${formattedRowNum}-` : "";
 		const folderName = `${folderPrefix}${numberPrefix}${safeTitle}`;
 
