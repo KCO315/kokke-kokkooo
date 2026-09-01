@@ -552,7 +552,8 @@ function navigateList(direction) {
 		if (targetIndex >= items.length) targetIndex = 0;
 	}
 	items[targetIndex].click();
-	items[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+	// ★ block: 'start' に変更
+	items[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 prevBtn.addEventListener('click', () => navigateList(-1));
 nextBtn.addEventListener('click', () => navigateList(1));
@@ -567,7 +568,6 @@ function updateGroupNumbers() {
 }
 
 if (loadBtn && folderInput) {
-	// ドラッグが重なった時の見た目の変更のみ行う
 	loadBtn.addEventListener('dragover', () => {
 		loadBtn.classList.add('drag-over');
 	});
@@ -578,8 +578,6 @@ if (loadBtn && folderInput) {
 
 	loadBtn.addEventListener('drop', () => {
 		loadBtn.classList.remove('drag-over');
-		// e.preventDefault() や JSでのファイル代入処理は行いません。
-		// 透明な <input> タグが直接フォルダを受け取り、中身を自動展開して change イベントを発生させます。
 	});
 }
 
@@ -591,7 +589,8 @@ folderInput.addEventListener('change', (event) => {
 
 	const validFiles = files.filter(file => !file.name.startsWith('.') && file.name.toLowerCase() !== 'log.txt');
 
-	if (validFiles.length > 0) document.getElementById('drag-hint-text').style.display = 'block';
+	// ★ display: 'flex' に変更
+	if (validFiles.length > 0) document.getElementById('drag-hint-text').style.display = 'flex';
 	else document.getElementById('drag-hint-text').style.display = 'none';
 
 	validFiles.sort((a, b) => {
@@ -627,9 +626,9 @@ folderInput.addEventListener('change', (event) => {
 		if (fileName.endsWith('.mp4')) fileIcon = "film";
 		else if (fileName.match(/\.(mp3|wav|m4a)$/)) fileIcon = "music";
 		else if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/)) fileIcon = "image";
-		else if (fileName.match(/\.(txt|pdf)$/)) fileIcon = "file-text";
+		else if (fileName.match(/\.(txt|pdf)$/)) fileIcon = "file";
 		else if (fileName.match(/\.(html|htm)$/)) fileIcon = "globe";
-		else { fileIcon = "file-text"; iconColorStyle = "color: #e74c3c;"; }
+		else { fileIcon = "file"; iconColorStyle = "color: #e74c3c;"; }
 
 		groupsMap.get(key).files.push({ file, fileIcon, iconColorStyle, subGroupName });
 	});
@@ -644,7 +643,20 @@ folderInput.addEventListener('change', (event) => {
 		const groupTitle = document.createElement('h4'); groupTitle.className = 'group-title';
 		let groupIcon = isStandaloneFile ? groupInfo.files[0].fileIcon : "folder";
 		let groupIconStyle = isStandaloneFile ? groupInfo.files[0].iconColorStyle : "";
-		groupTitle.innerHTML = `<span class="group-title-full"><span class="group-number"></span><i data-lucide="${groupIcon}" style="width:18px;height:18px; ${groupIconStyle}"></i> ${mainGroupName}</span><span class="group-title-short">${shortName}</span><button class="group-toggle-btn"><i data-lucide="chevron-up"></i></button>`;
+
+		// ★ アイコン内に数字を重ねるマークアップに変更
+		groupTitle.innerHTML = `
+			<span class="group-title-full">
+				<span class="group-icon-wrapper">
+					<i data-lucide="${groupIcon}" style="width:22px; height:22px; ${groupIconStyle}"></i>
+					<span class="group-number"></span>
+				</span>
+				${mainGroupName}
+			</span>
+			<span class="group-title-short">${shortName}</span>
+			<button class="group-toggle-btn"><i data-lucide="chevron-up"></i></button>
+		`;
+
 		const toggleBtn = groupTitle.querySelector('.group-toggle-btn');
 		toggleBtn.addEventListener('click', (e) => {
 			e.stopPropagation(); const container = e.target.closest('.group-container');
@@ -702,7 +714,6 @@ function setupGroupDragAndDrop(group) {
 	group.addEventListener('dragend', () => { group.classList.remove('dragging'); });
 
 	group.addEventListener('dragover', (e) => {
-		// グループを移動しているときのみブラウザ標準のドロップ許可を出す
 		const draggingGroup = document.querySelector('.group-container.dragging');
 		if (draggingGroup) {
 			e.preventDefault();
@@ -814,7 +825,7 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 					} else if (isKnownEmbeddable) {
 						iconSpan.innerHTML = '<i data-lucide="link" style="width:18px;height:18px;color:#333;"></i>';
 					} else {
-						iconSpan.innerHTML = '<i data-lucide="file-text" style="width:18px;height:18px;color:#333;"></i>';
+						iconSpan.innerHTML = '<i data-lucide="file" style="width:18px;height:18px;color:#333;"></i>';
 					}
 				}
 				lucide.createIcons({ root: iconSpan });
@@ -832,6 +843,11 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 	}
 
 	button.onclick = () => {
+		// ★ 親グループのアクティブクラス（has-active-item）切り替え処理
+		document.querySelectorAll('.group-container').forEach(group => group.classList.remove('has-active-item'));
+		const parentGroup = button.closest('.group-container');
+		if (parentGroup) parentGroup.classList.add('has-active-item');
+
 		document.querySelectorAll('.list-item').forEach(btn => btn.classList.remove('active'));
 		button.classList.add('active');
 
@@ -847,7 +863,6 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 		if (activeGroupName !== folderName) {
 			activeGroupName = folderName;
 			startTimer();
-			// グループ移動時に音量を初期値(100%)に戻す
 			volumeSlider.value = 1;
 			isMuted = false;
 			applyVolume();
@@ -863,21 +878,18 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 	});
 	button.addEventListener('dragend', () => { button.classList.remove('dragging'); });
 
-	// ★ アイテムのドラッグオーバー制御（Macのコピーアイコン防止と階層チェック）
 	const handleItemDragOverEnter = (e) => {
 		const draggingItem = document.querySelector('.list-item.dragging');
 		if (draggingItem) {
-			e.stopPropagation(); // 親（グループ）にイベントを伝えない
+			e.stopPropagation();
 			const dragSubgroup = draggingItem.getAttribute('data-subgroup');
 			const dropSubgroup = button.getAttribute('data-subgroup');
 
-			// 階層が違う場合は、e.preventDefault() を呼ばないことでOSに「ドロップ不可(🚫)」と認識させる
 			if (dragSubgroup !== dropSubgroup) {
 				e.dataTransfer.dropEffect = 'none';
 				return;
 			}
 
-			// 同一階層ならドロップを許可（デフォルトのアクションをキャンセル）
 			e.preventDefault();
 			e.dataTransfer.dropEffect = 'move';
 		}
@@ -889,12 +901,12 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 	button.addEventListener('drop', (e) => {
 		const draggingItem = document.querySelector('.list-item.dragging');
 		if (draggingItem && draggingItem !== button) {
-			e.stopPropagation(); // 親への伝播を防ぐ
+			e.stopPropagation();
 			const dragSubgroup = draggingItem.getAttribute('data-subgroup');
 			const dropSubgroup = button.getAttribute('data-subgroup');
-			if (dragSubgroup !== dropSubgroup) return; // 階層違いは無視
+			if (dragSubgroup !== dropSubgroup) return;
 
-			e.preventDefault(); // ここで最終的にブラウザの処理を停止
+			e.preventDefault();
 			const groupChildren = Array.from(container.children);
 			const draggingIndex = groupChildren.indexOf(draggingItem); const dropIndex = groupChildren.indexOf(button);
 			if (draggingIndex !== -1) { if (draggingIndex < dropIndex) button.after(draggingItem); else button.before(draggingItem); }
@@ -935,12 +947,10 @@ function showContent(file) {
 
 		contentLayer.appendChild(media);
 
-		// ★ 再生・一時停止・終了時にボタンの表示を同期
 		media.addEventListener('play', () => updatePlayPauseUI(true));
 		media.addEventListener('pause', () => updatePlayPauseUI(false));
 		media.addEventListener('ended', () => updatePlayPauseUI(false));
 
-		// ★ Web Audio API を使って100%以上の音量を実現
 		media.addEventListener('play', () => {
 			if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 			if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -970,7 +980,6 @@ function showContent(file) {
 		reader.onload = function (e) {
 			let text = e.target.result.trim();
 
-			// 【改善】クエリパラメータ付きのURLからでも確実に11桁の動画IDを取得
 			const ytMatch = text.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
 
 			if (ytMatch) {
@@ -983,7 +992,6 @@ function showContent(file) {
 						videoId: videoId, playerVars: { 'autoplay': 0, 'rel': 0, 'widget_referrer': 'http://localhost/' },
 						events: {
 							'onReady': function (event) { event.target.setVolume(Math.min(100, parseFloat(volumeSlider.value) * 100)); },
-							// ★ YouTube再生・一時停止・終了時にボタンの表示を同期
 							'onStateChange': function (event) {
 								if (event.data === YT.PlayerState.PLAYING) {
 									updatePlayPauseUI(true);
@@ -994,11 +1002,10 @@ function showContent(file) {
 						}
 					});
 				} else {
-					// 【フォールバック】APIが未ロードの場合は埋め込みURL（/embed/）を使用してブロックを回避
 					const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
 					contentLayer.innerHTML = `<div style="width:100%; height:100%; position:relative; background-color: #ffffff;"><iframe src="${embedUrl}" style="width:100%; height:100%; border:none; display: block;" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`;
 				}
-				return; // YouTube処理を終えたらここで終了し、下の一般URL判定に流さない
+				return;
 			}
 
 			if (text.toLowerCase().startsWith('<iframe')) {
@@ -1033,7 +1040,6 @@ function showContent(file) {
 						}
 					}
 				}
-				// ★ 安全なホスト判定 (CodeQL修正箇所)
 				else if ((host === 'sharepoint.com' || host.endsWith('.sharepoint.com')) || (host === '1drv.ms' || host.endsWith('.1drv.ms'))) {
 					try { const urlObj = new URL(text); urlObj.searchParams.set('action', 'embedview'); urlObj.searchParams.set('wdAr', '1.7777777777777777'); iframeSrc = urlObj.toString(); } catch (e) { console.error(e); }
 				}
@@ -1072,5 +1078,27 @@ function showContent(file) {
 		lucide.createIcons({ root: contentLayer });
 	}
 }
+
+// ★ 「すべて閉じる（開く）」のトグルイベントを追加
+let allGroupsCollapsed = false;
+document.addEventListener('click', (e) => {
+	if (e.target && e.target.id === 'toggle-all-groups-btn') {
+		allGroupsCollapsed = !allGroupsCollapsed;
+		const groups = document.querySelectorAll('.group-container');
+
+		groups.forEach(container => {
+			const toggleBtn = container.querySelector('.group-toggle-btn');
+			if (allGroupsCollapsed) {
+				container.classList.add('collapsed-group');
+				if (toggleBtn) toggleBtn.innerHTML = '<i data-lucide="chevron-down"></i>';
+			} else {
+				container.classList.remove('collapsed-group');
+				if (toggleBtn) toggleBtn.innerHTML = '<i data-lucide="chevron-up"></i>';
+			}
+		});
+		lucide.createIcons();
+		e.target.textContent = allGroupsCollapsed ? 'すべて開く' : 'すべて閉じる';
+	}
+});
 
 lucide.createIcons();

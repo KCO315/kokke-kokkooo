@@ -75,8 +75,6 @@ body {
 }
 
 .sticky-top {
-  position: sticky;
-  top: 0;
   background-color: #a6e0cf;
   z-index: 5;
   padding: 15px 15px 5px 15px;
@@ -923,6 +921,15 @@ iframe {
   margin: 0 auto;
 }
 
+.group-container.has-active-item .group-title {
+  background-color: #fece00;
+  color: #333333;
+  border-bottom-color: #dcb800;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
 body.chromakey-mode #main {
   background-color: #00ff00 !important;
 }
@@ -977,7 +984,7 @@ body.chromakey-mode #presentation-controls {
   margin-bottom: 15px;
   background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow: visible;
   cursor: grab;
 }
 
@@ -1004,6 +1011,9 @@ body.chromakey-mode #presentation-controls {
   display: flex;
   align-items: center;
   gap: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .group-title-full {
@@ -1013,16 +1023,40 @@ body.chromakey-mode #presentation-controls {
   gap: 4px;
 }
 
+/* アイコンと数字を包む親要素 */
+.group-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  flex-shrink: 0;
+  width: 22px; /* アイコンサイズと明示的に合わせる */
+  height: 22px;
+}
+
+/* 数字のスタイル（アイコン内部に収める設定） */
 .group-number {
-  display: inline-block;
-  background-color: #328f74;
-  color: #ffffff;
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-right: 4px;
+  position: absolute;
+  /* フォルダアイコン中央の少し下側にフィット */
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* アイコンの中に納まるフォントサイズ指定 */
+  color: #000000;
+  font-size: 9px;
   font-weight: 900;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  line-height: 1;
+  pointer-events: none;
+
+  /* 背景グリーンの縁取り（文字が潰れない太さ） */
+  background-color: transparent;
+  -webkit-text-stroke: ３px #a6e0cf;
+  paint-order: stroke fill;
+
+  text-shadow: none;
+  white-space: nowrap;
 }
 
 .group-number-short {
@@ -1074,6 +1108,7 @@ body.chromakey-mode #presentation-controls {
   width: calc(100% - 20px);
   padding: 10px;
   margin: 0 auto 8px auto;
+  scroll-margin-top: 63px;
   background-color: #ffffff;
   color: #444;
   border: 1px solid #ddd;
