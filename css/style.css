@@ -1031,30 +1031,32 @@ body.chromakey-mode #presentation-controls {
   justify-content: center;
   margin-right: 6px;
   flex-shrink: 0;
-  width: 22px; /* アイコンサイズと明示的に合わせる */
+  width: 22px;
   height: 22px;
 }
 
-/* 数字のスタイル（アイコン内部に収める設定） */
+/* ▼ SVGアイコン自体の塗りつぶし設定を追加 ▼ */
+.group-icon-wrapper svg {
+  fill: #328f74; /* アイコン内部を塗りつぶすグリーン */
+  stroke: #328f74; /* アイコンの枠線を少し濃い目のグリーンに */
+  stroke-width: 2;
+}
+
+/* 数字のスタイル */
 .group-number {
   position: absolute;
-  /* フォルダアイコン中央の少し下側にフィット */
   top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
 
-  /* アイコンの中に納まるフォントサイズ指定 */
-  color: #000000;
+  color: #ffffff;
   font-size: 9px;
   font-weight: 900;
   line-height: 1;
   pointer-events: none;
 
-  /* 背景グリーンの縁取り（文字が潰れない太さ） */
+  /* アイコン自体がグリーンで塗りつぶされたため、文字の周りの緑縁（stroke）は不要であれば消去・調整可能 */
   background-color: transparent;
-  -webkit-text-stroke: ３px #a6e0cf;
-  paint-order: stroke fill;
-
   text-shadow: none;
   white-space: nowrap;
 }
