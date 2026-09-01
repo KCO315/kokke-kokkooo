@@ -856,6 +856,11 @@ iframe {
   height: 24px;
 }
 
+/* グループが閉じている時の見出しをクリッカブルにする */
+.group-container.collapsed-group .group-title {
+  cursor: pointer;
+}
+
 .group-title-short {
   display: none;
 }

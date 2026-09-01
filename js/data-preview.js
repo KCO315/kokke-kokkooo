@@ -667,6 +667,22 @@ folderInput.addEventListener('change', (event) => {
 				lucide.createIcons({ root: toggleBtn });
 			}
 		});
+
+		// ▼ 閉じている状態で見出しをクリックした際に最初のリストを選択する処理 ▼
+		groupTitle.addEventListener('click', (e) => {
+			// 開閉ボタン（トグル）自体をクリックした場合はスキップ
+			if (e.target.closest('.group-toggle-btn')) return;
+
+			// グループが閉じている時のみ発火させる
+			if (currentGroupContainer.classList.contains('collapsed-group')) {
+				const firstItem = currentGroupContainer.querySelector('.list-item');
+				if (firstItem) {
+					firstItem.click(); // リスト本体をクリックした時と同じ表示処理を実行
+				}
+			}
+		});
+
+		currentGroupContainer.appendChild(groupTitle);
 		currentGroupContainer.appendChild(groupTitle);
 		setupGroupDragAndDrop(currentGroupContainer);
 
