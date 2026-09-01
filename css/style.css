@@ -1694,3 +1694,11 @@ body.chromakey-mode .text-preview-content {
   transform: scale(1.02);
   border: 2px dashed #333;
 }
+
+.enable-mosaic-below .group-container.has-active-item ~ .group-container {
+  filter: blur(5px);
+  opacity: 0.6;
+  transition:
+    filter 0.3s ease,
+    opacity 0.3s ease;
+}

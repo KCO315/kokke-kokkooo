@@ -104,7 +104,9 @@ function saveSettings() {
 		readmeFont: document.getElementById('setting-readme-font').value,
 		alarmTime: document.getElementById('setting-alarm-time').value,
 		alarmVol: document.getElementById('setting-alarm-vol').value,
-		alarmSound: document.getElementById('setting-alarm-sound') ? document.getElementById('setting-alarm-sound').value : 'se/call_niwatori.mp3'
+		alarmSound: document.getElementById('setting-alarm-sound') ? document.getElementById('setting-alarm-sound').value : 'se/call_niwatori.mp3',
+		mosaicBelow: document.getElementById('setting-mosaic-below') ? document.getElementById('setting-mosaic-below').checked : false, // 追加
+		alarmTime: document.getElementById('setting-alarm-time').value,
 	};
 	localStorage.setItem('kokekokkoAppSettings', JSON.stringify(settings));
 }
@@ -129,6 +131,9 @@ function loadSettings() {
 			}
 			if (settings.alarmSound !== undefined && document.getElementById('setting-alarm-sound')) {
 				document.getElementById('setting-alarm-sound').value = settings.alarmSound;
+			}
+			if (settings.mosaicBelow !== undefined && document.getElementById('setting-mosaic-below')) {
+				document.getElementById('setting-mosaic-below').checked = settings.mosaicBelow;
 			}
 		} catch (e) {
 			console.error("設定の復元に失敗しました", e);
@@ -254,7 +259,9 @@ function sendSettingsToPreviewFrame() {
 				readmeFontFamily: readmeFontSelect ? readmeFontSelect.value : "'Sawarabi Gothic', sans-serif",
 				alarmTime: alarmTimeInput ? (parseInt(alarmTimeInput.value) || 0) : 0,
 				alarmVol: alarmVolInput ? (parseFloat(alarmVolInput.value) || 0.5) : 0.5,
-				alarmSound: alarmSoundSelect ? alarmSoundSelect.value : 'se/call_niwatori.mp3'
+				alarmSound: alarmSoundSelect ? alarmSoundSelect.value : 'se/call_niwatori.mp3',
+				mosaicBelow: document.getElementById('setting-mosaic-below') ? document.getElementById('setting-mosaic-below').checked : false, // 追加
+				alarmTime: alarmTimeInput ? (parseInt(alarmTimeInput.value) || 0) : 0
 			}
 		}, '*');
 	}
@@ -367,5 +374,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	sendSettingsToCsvFrame();
 	sendSettingsToPreviewFrame();
 });
+
+const mosaicBelowCheck = document.getElementById('setting-mosaic-below');
+if (mosaicBelowCheck) {
+	mosaicBelowCheck.addEventListener('change', () => {
+		saveSettings();
+		sendSettingsToPreviewFrame();
+	});
+}
 
 lucide.createIcons();

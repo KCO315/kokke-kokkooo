@@ -157,6 +157,18 @@ window.addEventListener('message', (event) => {
 		if (s.alarmVol !== undefined) alarmSettings.vol = s.alarmVol;
 		if (s.alarmSound !== undefined) alarmSettings.sound = s.alarmSound;
 
+		// ▼ モザイク設定の判定をこのブロック内に配置する ▼
+		if (s.mosaicBelow !== undefined) {
+			const listContainer = document.getElementById('list-container');
+			if (listContainer) {
+				if (s.mosaicBelow) {
+					listContainer.classList.add('enable-mosaic-below');
+				} else {
+					listContainer.classList.remove('enable-mosaic-below');
+				}
+			}
+		}
+
 		// 現在READMEを表示中であれば即時反映
 		const activeItem = document.querySelector('.list-item.active');
 		if (activeItem && activeItem.textContent.toLowerCase().includes('readme')) {
