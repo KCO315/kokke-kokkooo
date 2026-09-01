@@ -1719,10 +1719,9 @@ body.chromakey-mode .text-preview-content {
   transform: translate(-50%, -50%);
 
   /* テキストバッジのデザイン */
-  background-color: #ffffff; /* テーマのグリーン */
-  color: #328f74;
+  background-color: #328f74; /* テーマのグリーン */
+  color: #ffffff;
   padding: 4px 12px;
-  border: 1px solid #ffffff;
   font-size: 0.8rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
