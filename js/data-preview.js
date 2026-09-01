@@ -651,6 +651,10 @@ folderInput.addEventListener('change', (event) => {
 		const isStandaloneFile = groupInfo.isStandaloneFile;
 		const currentGroupContainer = document.createElement('div');
 		currentGroupContainer.className = 'group-container'; currentGroupContainer.draggable = true;
+		const match = mainGroupName.match(/【#(.+?)】/);
+		if (match) {
+			currentGroupContainer.setAttribute('data-overlay-text', match[1]);
+		}
 		const shortName = mainGroupName.substring(0, 3);
 		const groupTitle = document.createElement('h4'); groupTitle.className = 'group-title';
 		let groupIcon = isStandaloneFile ? groupInfo.files[0].fileIcon : "folder";
