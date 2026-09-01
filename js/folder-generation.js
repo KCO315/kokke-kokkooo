@@ -272,14 +272,14 @@ function generateCsvFolderName(row) {
 
 function processCsvTextAndExtractUrls(text, startIndex) {
 	if (typeof text !== 'string') return { text, urls: [], nextIndex: startIndex };
-	const urlRegex = /(https?:\/\/[^\s]+)/g;
+	const urlRegex = /(https?:\/\/(?:(?![;；,，]\s*https?:\/\/)[^\s])+)/g;
 	const urls = []; let currentCount = startIndex;
 
 	// セレクトボックスからURL表記方法を取得（初期値は'number'）
 	const urlFormat = csvUrlFormatSelect ? csvUrlFormatSelect.value : 'number';
 
 	const replacedText = text.replace(urlRegex, (match) => {
-		const cleanUrl = match.replace(/,+$/, ''); const trailing = match.substring(cleanUrl.length);
+		const cleanUrl = match.replace(/[;；,，]+$/, ''); const trailing = match.substring(cleanUrl.length);
 		let domainStr = 'unknown';
 		try { const urlObj = new URL(cleanUrl); domainStr = urlObj.hostname.replace(/\./g, '-'); } catch (e) { }
 
