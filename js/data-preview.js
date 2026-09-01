@@ -930,6 +930,9 @@ function showContent(file) {
 	applyZoom(currentZoom, 1.0); currentZoom = 1.0;
 	if (ytPlayer) { ytPlayer.destroy(); ytPlayer = null; }
 
+	// デフォルトでスライダーの最大値を3（300%）に戻す
+	volumeSlider.max = "3";
+
 	const fileURL = URL.createObjectURL(file);
 	const fileName = file.name.toLowerCase();
 
@@ -990,6 +993,15 @@ function showContent(file) {
 
 			if (ytMatch) {
 				setControlsEnabled(true);
+
+				// YouTubeの場合は最大値を1（100%）に制限する
+				volumeSlider.max = "1";
+				if (parseFloat(volumeSlider.value) > 1) {
+					volumeSlider.value = "1";
+					applyVolume();
+					updateVolumeIcon(1);
+				}
+
 				externalLinkBtn.href = text; externalLinkBtn.style.display = 'flex';
 				const videoId = ytMatch[1];
 
