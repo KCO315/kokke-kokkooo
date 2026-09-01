@@ -8,7 +8,7 @@ const csvState = {
 	settings: {
 		useFolderNumber: true,
 		useUrlDomain: true,
-		readmeHeadingStyle: 'hash'
+		readmeHeadingStyle: 'bracket'
 	}
 };
 
@@ -71,7 +71,15 @@ function loadCsvFile(file) {
 			csvState.categoryHistory.clear();
 
 			csvState.headers.forEach(h => {
-				if (h.includes('タイムスタンプ') || h.includes('連絡先')) csvState.hiddenColumns.add(h);
+				if (
+					h.includes('タイムスタンプ') ||
+					h.includes('【連絡先】') ||
+					h.includes('連絡先') ||
+					h.includes('送信確認用の名前') ||
+					h.includes('質問など')
+				) {
+					csvState.hiddenColumns.add(h);
+				}
 			});
 			const titleCol = csvState.headers.find(h => h.includes('タイトル'));
 			if (titleCol) csvState.filenameColumns = [titleCol];
@@ -299,6 +307,32 @@ function processCsvTextAndExtractUrls(text, startIndex) {
 
 function formatCsvRowData(row) {
 	let infoText = ""; let extractedUrls = []; let globalUrlCount = 1;
+	let editedColData = null;
+	const currentEditedText = csvState.editedFiles[csvState.currentIndex]?.['readme'];
+	if (currentEditedText) {
+		editedColData = {};
+		const positions = [];
+		csvState.headers.forEach(h => {
+			let headingText = "";
+			switch (csvState.settings.readmeHeadingStyle) {
+				case 'bracket': headingText = `【${h}】`; break;
+				case 'line': headingText = `―― ${h} ――`; break;
+				case 'none': headingText = `${h}\n`; break;
+				case 'hash': default: headingText = `# ${h}`; break;
+			}
+			const idx = currentEditedText.indexOf(headingText);
+			if (idx !== -1) positions.push({ header: h, index: idx, headingText });
+		});
+		positions.sort((a, b) => a.index - b.index);
+
+		for (let i = 0; i < positions.length; i++) {
+			const start = positions[i].index + positions[i].headingText.length;
+			const end = (i + 1 < positions.length) ? positions[i + 1].index : currentEditedText.length;
+			// 前後の余分な改行をトリムして保存
+			let val = currentEditedText.substring(start, end).replace(/^\s*\n/, '').replace(/\n\s*$/, '');
+			editedColData[positions[i].header] = val;
+		}
+	}
 	csvState.headers.forEach(header => {
 		const { text, urls, nextIndex } = processCsvTextAndExtractUrls(row[header], globalUrlCount);
 		extractedUrls = [...extractedUrls, ...urls]; globalUrlCount = nextIndex;
@@ -311,7 +345,11 @@ function formatCsvRowData(row) {
 				case 'hash':
 				default: headingText = `# ${header}\n`; break;
 			}
-			infoText += `${headingText}${text}\n\n`;
+			let contentText = text;
+			if (editedColData && editedColData[header] !== undefined) {
+				contentText = editedColData[header];
+			}
+			infoText += `${headingText}${contentText}\n\n`;
 		}
 	});
 	return { infoText, extractedUrls };
@@ -406,6 +444,9 @@ function updateCsvPreview() {
 	if (csvState.csvData.length === 0) return;
 	const row = csvState.csvData[csvState.currentIndex];
 	const { infoText, extractedUrls } = formatCsvRowData(row);
+	if (csvState.editedFiles[csvState.currentIndex] && csvState.editedFiles[csvState.currentIndex]['readme']) {
+		csvState.editedFiles[csvState.currentIndex]['readme'] = infoText.trim();
+	}
 	const formattedRowNum = String(csvState.currentIndex + 1).padStart(3, '0');
 	const folderTitle = generateCsvFolderName(row);
 	const safeTitle = folderTitle.replace(/[\\/:*?"<>|]/g, '_');

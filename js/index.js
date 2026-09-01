@@ -364,6 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	loadSettings();
 	updateReadmeSizeInputsState();
 	updateMiniPreview();
+	sendSettingsToCsvFrame();
+	sendSettingsToPreviewFrame();
 });
 
 lucide.createIcons();
