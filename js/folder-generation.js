@@ -387,7 +387,7 @@ let currentFileId = null; // 現在表示中のファイルID（'readme' や 'UR
 function updateCsvPreviewContent(fileData) {
 	currentFileId = fileData.id;
 
-	// 追加：データ表示時は pre-wrap を有効にする
+	// データ表示時は pre-wrap を有効にする
 	csvPreviewContent.classList.add('is-loaded');
 
 	// 手動でドロップされた追加ファイルの場合
@@ -417,8 +417,12 @@ function updateCsvPreviewContent(fileData) {
 	const editedContent = csvState.editedFiles[csvState.currentIndex]?.[fileData.id];
 
 	if (editedContent !== undefined) {
-		// 編集履歴がある場合は、そのテキストを表示
-		csvPreviewContent.innerText = editedContent;
+		// 編集履歴がある場合もURLならリンクとして表示
+		if (fileData.isUrl) {
+			csvPreviewContent.innerHTML = `<a href="${editedContent}" target="_blank" rel="noopener noreferrer" style="color: #007b5e; text-decoration: underline; word-break: break-all;">${editedContent}</a>`;
+		} else {
+			csvPreviewContent.innerText = editedContent;
+		}
 	} else {
 		// 編集履歴がない場合は初期表示
 		if (fileData.isUrl) {
@@ -437,6 +441,15 @@ csvPreviewContent.addEventListener('input', () => {
 		}
 		// innerText を使うことで、画面上の改行をそのままZIPにも反映できるようにする
 		csvState.editedFiles[csvState.currentIndex][currentFileId] = csvPreviewContent.innerText;
+	}
+});
+
+// プレビューエリア内のリンククリック時にリンク先へアクセスする
+csvPreviewContent.addEventListener('click', (e) => {
+	const anchor = e.target.closest('a');
+	if (anchor && csvPreviewContent.getAttribute('contenteditable') === 'true') {
+		e.preventDefault(); // カーソル移動などのデフォルト挙動を防止
+		window.open(anchor.href, '_blank', 'noopener,noreferrer');
 	}
 });
 
