@@ -856,6 +856,16 @@ iframe {
   height: 24px;
 }
 
+.group-container.collapsed-group {
+  background-color: transparent;
+  padding-bottom: 0;
+  border: none;
+}
+
+.group-container.collapsed-group .list-container {
+  display: none;
+}
+
 /* グループが閉じている時の見出しをクリッカブルにする */
 .group-container.collapsed-group .group-title {
   cursor: pointer;
@@ -1009,7 +1019,7 @@ body.chromakey-mode #presentation-controls {
   margin-bottom: 10px;
   font-size: 13px;
   color: #444;
-  background-color: #c5ebdf;
+  background-color: #e2f5ef;
   padding: 8px 10px;
   border-bottom: 1px solid #b0d4c8;
   font-weight: bold;
