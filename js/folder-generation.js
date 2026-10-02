@@ -283,7 +283,14 @@ function processCsvTextAndExtractUrls(text, startIndex) {
 		let cleanUrl = match.replace(/[;；,，]+$/, ''); const trailing = match.substring(cleanUrl.length);
 
 		// ▼ GoogleドライブURLのアクセス権エラー対策を追加 ▼
-		if (cleanUrl.includes('drive.google.com')) {
+		let isGoogleDriveHost = false;
+		try {
+			const parsedForDriveCheck = new URL(cleanUrl);
+			const host = parsedForDriveCheck.hostname.toLowerCase();
+			isGoogleDriveHost = (host === 'drive.google.com');
+		} catch (e) { }
+
+		if (isGoogleDriveHost) {
 			// 1. /u/0/ や /u/1/ などのアカウント強制指定パスを削除
 			cleanUrl = cleanUrl.replace(/\/u\/\d+\//, '/');
 
