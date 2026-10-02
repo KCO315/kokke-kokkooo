@@ -142,13 +142,49 @@
 							data-lucide="zoom-in"></i>リセット</button>
 				</div>
 
-				<div id="timer-display-container">
-					<div class="analog-clock">
-						<div class="second-hand" id="second-hand"></div>
+				<div
+					style="display: flex; align-items: flex-end; gap: 10px; margin-left: auto; margin-right: 20px; z-index: 70;">
+
+					<!-- アラーム設定UI -->
+					<div id="alarm-controls-container"
+						style="display: flex; align-items: center; background-color: #ffffff; padding: 4px 12px; border-radius: 20px 20px 0 0; border: 2px solid #a6e0cf; border-bottom: none; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03); font-size: 13px; color: #555; gap: 8px;">
+						<i data-lucide="bird" style="width:14px; height:14px;"></i>
+						<div style="display: flex; align-items: center; gap: 2px;">
+							<input type="number" id="setting-alarm-time" value="0" min="0"
+								style="width: 45px; border: 1px solid #eee; border-radius: 4px; padding: 2px; text-align: center;">分
+						</div>
+						<select id="setting-alarm-sound"
+							style="border: 1px solid #eee; border-radius: 4px; padding: 2px; outline: none; cursor: pointer;">
+							<option value="se/call_niwatori.mp3" selected>ニワトリ</option>
+							<option value="se/call_ahiru.mp3">アヒル</option>
+							<option value="se/call_cuckoo.mp3">カッコウ</option>
+							<option value="se/call_kizibato.mp3">キジバト</option>
+							<option value="se/call_ohruri.mp3">オオルリ</option>
+							<option value="se/call_kekkahappyo.mp3">ｹｯｶﾊｯﾋﾟｮ-</option>
+							<option value="random">（ランダム）</option>
+						</select>
+						<div
+							style="display: flex; align-items: center; gap: 4px; border-left: 1px solid #ddd; padding-left: 8px;">
+							<i data-lucide="volume-2" style="width:14px; height:14px;"></i>
+							<input type="range" id="setting-alarm-vol" min="0" max="1" step="0.05" value="0.5"
+								style="width: 60px; accent-color: #328f74; cursor: pointer;">
+							<button id="test-alarm-btn" title="テスト再生"
+								style="background: none; border: none; cursor: pointer; display: flex; align-items: center; color: #555; padding: 2px;">
+								<i data-lucide="play-circle" style="width:16px; height:16px;"></i>
+							</button>
+						</div>
 					</div>
-					<span id="timer-text">0分</span>
-					<button id="toggle-timer-inline-btn" title="タイマーを隠す"><i data-lucide="eye"></i></button>
+
+					<!-- タイマー -->
+					<div id="timer-display-container" style="margin-right: 0;">
+						<div class="analog-clock">
+							<div class="second-hand" id="second-hand"></div>
+						</div>
+						<span id="timer-text">0分</span>
+						<button id="toggle-timer-inline-btn" title="タイマーを隠す"><i data-lucide="eye"></i></button>
+					</div>
 				</div>
+
 			</div>
 
 			<div id="presentation-area">

@@ -21,9 +21,6 @@ function saveSettings() {
 	if (document.getElementById('setting-readme-font-size')) settings.readmeFontSize = document.getElementById('setting-readme-font-size').value;
 	if (document.getElementById('setting-readme-bg')) settings.readmeBg = document.getElementById('setting-readme-bg').value;
 	if (document.getElementById('setting-readme-font')) settings.readmeFont = document.getElementById('setting-readme-font').value;
-	if (document.getElementById('setting-alarm-time')) settings.alarmTime = document.getElementById('setting-alarm-time').value;
-	if (document.getElementById('setting-alarm-vol')) settings.alarmVol = document.getElementById('setting-alarm-vol').value;
-	if (document.getElementById('setting-alarm-sound')) settings.alarmSound = document.getElementById('setting-alarm-sound') ? document.getElementById('setting-alarm-sound').value : 'se/call_niwatori.mp3';
 	if (document.getElementById('setting-mosaic-below')) settings.mosaicBelow = document.getElementById('setting-mosaic-below').checked;
 
 	localStorage.setItem('kokekokkoAppSettings', JSON.stringify(settings));
@@ -34,18 +31,9 @@ function loadSettings() {
 	if (saved) {
 		try {
 			const settings = JSON.parse(saved);
-			// ※ここで「folderNumber」や「readmeHeading」「readmeAuto」などの不要になったif文を削除しています
 			if (settings.readmeFontSize !== undefined && document.getElementById('setting-readme-font-size')) document.getElementById('setting-readme-font-size').value = settings.readmeFontSize;
 			if (settings.readmeBg !== undefined && document.getElementById('setting-readme-bg')) document.getElementById('setting-readme-bg').value = settings.readmeBg;
 			if (settings.readmeFont !== undefined && document.getElementById('setting-readme-font')) document.getElementById('setting-readme-font').value = settings.readmeFont;
-			if (settings.alarmTime !== undefined && document.getElementById('setting-alarm-time')) document.getElementById('setting-alarm-time').value = settings.alarmTime;
-			if (settings.alarmVol !== undefined && document.getElementById('setting-alarm-vol')) {
-				document.getElementById('setting-alarm-vol').value = settings.alarmVol;
-				document.getElementById('alarm-vol-display').innerText = Math.round(settings.alarmVol * 100) + '%';
-			}
-			if (settings.alarmSound !== undefined && document.getElementById('setting-alarm-sound')) {
-				document.getElementById('setting-alarm-sound').value = settings.alarmSound;
-			}
 			if (settings.mosaicBelow !== undefined && document.getElementById('setting-mosaic-below')) {
 				document.getElementById('setting-mosaic-below').checked = settings.mosaicBelow;
 			}
@@ -96,27 +84,14 @@ const readmeBgInput = document.getElementById('setting-readme-bg');
 const readmeFontSelect = document.getElementById('setting-readme-font');
 const resetReadmeBtn = document.getElementById('reset-readme-btn');
 
-const alarmTimeInput = document.getElementById('setting-alarm-time');
-const alarmVolInput = document.getElementById('setting-alarm-vol');
-const alarmVolDisplay = document.getElementById('alarm-vol-display');
-const testAlarmBtn = document.getElementById('test-alarm-btn');
-const alarmSoundSelect = document.getElementById('setting-alarm-sound');
-
 function sendSettingsToPreviewFrame() {
 	if (framePreview && framePreview.contentWindow) {
 		framePreview.contentWindow.postMessage({
 			type: 'updatePreviewSettings',
 			settings: {
-				// 配信画面がエラーにならないよう、固定値として1024x768とAuto:trueを渡す
-				readmeAuto: true,
-				readmeWidth: 1024,
-				readmeHeight: 768,
 				readmeFontSize: readmeFontSizeInput ? (parseInt(readmeFontSizeInput.value) || 20) : 20,
 				readmeBgColor: readmeBgInput ? readmeBgInput.value : '#fdfbf7',
 				readmeFontFamily: readmeFontSelect ? readmeFontSelect.value : "'Sawarabi Gothic', sans-serif",
-				alarmTime: alarmTimeInput ? (parseInt(alarmTimeInput.value) || 0) : 0,
-				alarmVol: alarmVolInput ? (parseFloat(alarmVolInput.value) || 0.5) : 0.5,
-				alarmSound: alarmSoundSelect ? alarmSoundSelect.value : 'se/call_niwatori.mp3',
 				mosaicBelow: document.getElementById('setting-mosaic-below') ? document.getElementById('setting-mosaic-below').checked : false
 			}
 		}, '*');
@@ -126,45 +101,6 @@ function sendSettingsToPreviewFrame() {
 if (readmeFontSizeInput) readmeFontSizeInput.addEventListener('input', () => { saveSettings(); sendSettingsToPreviewFrame(); });
 if (readmeBgInput) readmeBgInput.addEventListener('input', () => { saveSettings(); sendSettingsToPreviewFrame(); });
 if (readmeFontSelect) readmeFontSelect.addEventListener('change', () => { saveSettings(); sendSettingsToPreviewFrame(); });
-
-if (alarmTimeInput) alarmTimeInput.addEventListener('change', () => { saveSettings(); sendSettingsToPreviewFrame(); });
-if (alarmVolInput) {
-	alarmVolInput.addEventListener('input', () => {
-		alarmVolDisplay.innerText = Math.round(alarmVolInput.value * 100) + '%';
-		saveSettings();
-		sendSettingsToPreviewFrame();
-	});
-}
-if (alarmSoundSelect) {
-	alarmSoundSelect.addEventListener('change', () => {
-		saveSettings();
-		sendSettingsToPreviewFrame();
-	});
-}
-
-// --- MP3によるアラーム再生処理 ---
-let alarmAudio = new Audio('se/call_niwatori.mp3');
-
-function playRoosterVoice() {
-	let masterVol = parseFloat(alarmVolInput.value) || 0.5;
-	if (masterVol <= 0) return;
-
-	let soundSrc = alarmSoundSelect ? alarmSoundSelect.value : 'se/call_niwatori.mp3';
-	alarmAudio.src = soundSrc;
-
-	alarmAudio.currentTime = 0;
-	alarmAudio.volume = masterVol;
-
-	alarmAudio.play().catch(e => {
-		console.error("音声の再生に失敗しました:", e);
-	});
-}
-
-if (testAlarmBtn) {
-	testAlarmBtn.addEventListener('click', () => {
-		playRoosterVoice();
-	});
-}
 
 if (resetReadmeBtn) {
 	resetReadmeBtn.addEventListener('click', () => {

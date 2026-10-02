@@ -66,9 +66,6 @@ const inputHeight = document.getElementById('input-height');
 const readmeSettingsBtn = document.getElementById('readme-settings-btn');
 
 const globalSettings = {
-	readmeAuto: true,
-	readmeWidth: 1024,
-	readmeHeight: 768,
 	readmeFontSize: 20,
 	readmeBgColor: '#fdfbf7',
 	readmeFontFamily: "'Sawarabi Gothic', sans-serif"
@@ -105,7 +102,30 @@ function playAlarm(overrideVol) {
 	let masterVol = overrideVol !== undefined ? overrideVol : alarmSettings.vol;
 	if (masterVol <= 0) return;
 
-	alarmAudio.src = alarmSettings.sound || 'se/call_niwatori.mp3';
+	let soundSrc = alarmSettings.sound || 'se/call_niwatori.mp3';
+
+	// ランダムが選択されている場合の処理
+	if (soundSrc === 'random') {
+		const selectEl = document.getElementById('setting-alarm-sound');
+		if (selectEl) {
+			// 'random' 以外の選択肢の value を配列として取得
+			const availableOptions = Array.from(selectEl.options)
+				.map(opt => opt.value)
+				.filter(val => val !== 'random');
+
+			if (availableOptions.length > 0) {
+				// 取得した配列の中からランダムに1つ選ぶ
+				const randomIndex = Math.floor(Math.random() * availableOptions.length);
+				soundSrc = availableOptions[randomIndex];
+			} else {
+				soundSrc = 'se/call_niwatori.mp3'; // 万が一選択肢がない場合のフォールバック
+			}
+		} else {
+			soundSrc = 'se/call_niwatori.mp3';
+		}
+	}
+
+	alarmAudio.src = soundSrc;
 	alarmAudio.currentTime = 0;
 	alarmAudio.volume = masterVol;
 
@@ -147,9 +167,6 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('message', (event) => {
 	if (event.data && event.data.type === 'updatePreviewSettings') {
 		const s = event.data.settings;
-		if (s.readmeAuto !== undefined) globalSettings.readmeAuto = s.readmeAuto;
-		if (s.readmeWidth !== undefined) globalSettings.readmeWidth = s.readmeWidth;
-		if (s.readmeHeight !== undefined) globalSettings.readmeHeight = s.readmeHeight;
 		if (s.readmeFontSize !== undefined) globalSettings.readmeFontSize = s.readmeFontSize;
 		if (s.readmeBgColor !== undefined) globalSettings.readmeBgColor = s.readmeBgColor;
 		if (s.readmeFontFamily !== undefined) globalSettings.readmeFontFamily = s.readmeFontFamily;
@@ -157,7 +174,6 @@ window.addEventListener('message', (event) => {
 		if (s.alarmVol !== undefined) alarmSettings.vol = s.alarmVol;
 		if (s.alarmSound !== undefined) alarmSettings.sound = s.alarmSound;
 
-		// ▼ モザイク設定の判定をこのブロック内に配置する ▼
 		if (s.mosaicBelow !== undefined) {
 			const listContainer = document.getElementById('list-container');
 			if (listContainer) {
@@ -172,11 +188,6 @@ window.addEventListener('message', (event) => {
 		// 現在READMEを表示中であれば即時反映
 		const activeItem = document.querySelector('.list-item.active');
 		if (activeItem && activeItem.textContent.toLowerCase().includes('readme')) {
-			if (globalSettings.readmeAuto) {
-				applySize(globalSettings.readmeWidth, globalSettings.readmeHeight, `${globalSettings.readmeWidth}x${globalSettings.readmeHeight}`);
-			} else {
-				restoreUserSize();
-			}
 			// フォント・背景も即時反映
 			const pre = contentLayer.querySelector('.text-preview-content');
 			if (pre) {
@@ -401,8 +412,12 @@ function getMousePos(evt) {
 	return { x: (evt.clientX - rect.left) / currentZoom, y: (evt.clientY - rect.top) / currentZoom };
 }
 
-canvas.addEventListener('mousedown', (e) => {
+// スマホやペンタブの不要なスクロールを防ぐ
+canvas.style.touchAction = 'none';
+
+canvas.addEventListener('pointerdown', (e) => {
 	if (!isDrawingMode) return;
+	e.preventDefault();
 	isDrawing = true;
 	const pos = getMousePos(e);
 	const centerX = canvas.width / 2; const centerY = canvas.height / 2;
@@ -410,15 +425,17 @@ canvas.addEventListener('mousedown', (e) => {
 	drawingHistory.push(currentStroke);
 	ctx.beginPath(); applyCurrentMode(); ctx.moveTo(pos.x, pos.y);
 });
-canvas.addEventListener('mousemove', (e) => {
+canvas.addEventListener('pointermove', (e) => {
 	if (!isDrawing || !isDrawingMode) return;
+	e.preventDefault();
 	const pos = getMousePos(e);
 	const centerX = canvas.width / 2; const centerY = canvas.height / 2;
 	currentStroke.points.push({ x: pos.x - centerX, y: pos.y - centerY });
 	ctx.lineTo(pos.x, pos.y); ctx.stroke();
 });
-canvas.addEventListener('mouseup', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
-canvas.addEventListener('mouseout', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
+canvas.addEventListener('pointerup', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
+canvas.addEventListener('pointerout', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
+canvas.addEventListener('pointercancel', () => { if (isDrawing) { ctx.closePath(); isDrawing = false; } });
 
 // ★ 音量最大300%対応（Web Audio API の GainNode と連動）
 function applyVolume() {
@@ -883,13 +900,8 @@ function createListButton(file, container, folderName, subGroupName = "", fileIc
 		document.querySelectorAll('.list-item').forEach(btn => btn.classList.remove('active'));
 		button.classList.add('active');
 
-		const isReadme = file.name.toLowerCase().startsWith('readme');
-
-		if (isReadme && globalSettings.readmeAuto) {
-			applySize(globalSettings.readmeWidth, globalSettings.readmeHeight, `${globalSettings.readmeWidth}x${globalSettings.readmeHeight}`);
-		} else {
-			restoreUserSize();
-		}
+		// READMEのサイズ分岐を削除し、常に設定サイズを維持
+		restoreUserSize();
 
 		showContent(file);
 		if (activeGroupName !== folderName) {
@@ -958,11 +970,14 @@ function showContent(file) {
 	updatePlayPauseUI(false);
 	contentLayer.innerHTML = '';
 	externalLinkBtn.style.display = 'none';
-	drawingHistory = []; redrawCanvas();
+	if (!isDrawingMode) {
+		drawingHistory = [];
+		redrawCanvas();
+	}
+
 	applyZoom(currentZoom, 1.0); currentZoom = 1.0;
 	if (ytPlayer) { ytPlayer.destroy(); ytPlayer = null; }
 
-	// デフォルトでスライダーの最大値を3（300%）に戻す
 	volumeSlider.max = "3";
 
 	const fileURL = URL.createObjectURL(file);
@@ -1121,9 +1136,6 @@ function showContent(file) {
 					pre.style.backgroundColor = globalSettings.readmeBgColor || '#fdfbf7';
 					pre.style.color = getTextColorForBackground(globalSettings.readmeBgColor || '#fdfbf7');
 					pre.style.fontFamily = globalSettings.readmeFontFamily || "'Sawarabi Gothic', sans-serif";
-					if (globalSettings.readmeAuto) {
-						applySize(globalSettings.readmeWidth, globalSettings.readmeHeight, `${globalSettings.readmeWidth}x${globalSettings.readmeHeight}`);
-					}
 				}
 			}
 		};
@@ -1181,5 +1193,60 @@ function setControlsEnabled(enabled) {
 		volumeContainer.classList.add('control-disabled');
 	}
 }
+
+// --- アラーム設定のUI連動と保存 ---
+const settingAlarmTime = document.getElementById('setting-alarm-time');
+const settingAlarmSound = document.getElementById('setting-alarm-sound');
+const settingAlarmVol = document.getElementById('setting-alarm-vol');
+const testAlarmBtn = document.getElementById('test-alarm-btn');
+
+function saveAlarmSettings() {
+	let settings = {};
+	try {
+		const saved = localStorage.getItem('kokekokkoAppSettings');
+		if (saved) settings = JSON.parse(saved);
+	} catch (e) { }
+
+	settings.alarmTime = settingAlarmTime.value;
+	settings.alarmSound = settingAlarmSound.value;
+	settings.alarmVol = settingAlarmVol.value;
+
+	localStorage.setItem('kokekokkoAppSettings', JSON.stringify(settings));
+
+	alarmSettings.time = parseInt(settingAlarmTime.value) || 0;
+	alarmSettings.sound = settingAlarmSound.value;
+	alarmSettings.vol = parseFloat(settingAlarmVol.value) || 0.5;
+}
+
+function loadAlarmSettings() {
+	try {
+		const saved = localStorage.getItem('kokekokkoAppSettings');
+		if (saved) {
+			const settings = JSON.parse(saved);
+			if (settings.alarmTime !== undefined && settingAlarmTime) settingAlarmTime.value = settings.alarmTime;
+			if (settings.alarmSound !== undefined && settingAlarmSound) settingAlarmSound.value = settings.alarmSound;
+			if (settings.alarmVol !== undefined && settingAlarmVol) settingAlarmVol.value = settings.alarmVol;
+		}
+	} catch (e) { }
+
+	if (settingAlarmTime) alarmSettings.time = parseInt(settingAlarmTime.value) || 0;
+	if (settingAlarmSound) alarmSettings.sound = settingAlarmSound.value;
+	if (settingAlarmVol) alarmSettings.vol = parseFloat(settingAlarmVol.value) || 0.5;
+}
+
+if (settingAlarmTime) settingAlarmTime.addEventListener('change', saveAlarmSettings);
+if (settingAlarmSound) settingAlarmSound.addEventListener('change', saveAlarmSettings);
+if (settingAlarmVol) settingAlarmVol.addEventListener('input', saveAlarmSettings);
+
+if (testAlarmBtn) {
+	testAlarmBtn.addEventListener('click', () => {
+		playAlarm(parseFloat(settingAlarmVol.value) || 0.5);
+	});
+}
+
+// 初期化時にアラーム設定を読み込む
+document.addEventListener('DOMContentLoaded', () => {
+	loadAlarmSettings();
+});
 
 lucide.createIcons();
