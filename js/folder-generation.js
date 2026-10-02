@@ -12,15 +12,6 @@ const csvState = {
 	}
 };
 
-// 親フレーム(index.html)からの設定受信
-window.addEventListener('message', (event) => {
-	if (event.data && event.data.type === 'updateCsvSettings') {
-		csvState.settings = event.data.settings;
-		// 設定が変わったらプレビューを更新
-		updateCsvPreview();
-	}
-});
-
 const csvFileInput = document.getElementById('csv-file');
 
 const csvRowSelect = document.getElementById('csv-row-select');
@@ -828,5 +819,58 @@ if (csvAddFileInput) {
 		}
 	});
 }
+
+// --- 設定項目のイベントと保存処理 ---
+const csvFolderNumberCheck = document.getElementById('csv-folder-number');
+const csvReadmeHeadingSelect = document.getElementById('csv-readme-heading');
+
+function saveCsvSettings() {
+	let settings = {};
+	try {
+		const saved = localStorage.getItem('kokekokkoAppSettings');
+		if (saved) settings = JSON.parse(saved);
+	} catch (e) { }
+
+	if (csvFolderNumberCheck) settings.folderNumber = csvFolderNumberCheck.checked;
+	if (csvReadmeHeadingSelect) settings.readmeHeading = csvReadmeHeadingSelect.value;
+
+	localStorage.setItem('kokekokkoAppSettings', JSON.stringify(settings));
+}
+
+function loadCsvSettings() {
+	try {
+		const saved = localStorage.getItem('kokekokkoAppSettings');
+		if (saved) {
+			const settings = JSON.parse(saved);
+			if (settings.folderNumber !== undefined && csvFolderNumberCheck) {
+				csvFolderNumberCheck.checked = settings.folderNumber;
+				csvState.settings.useFolderNumber = settings.folderNumber;
+			}
+			if (settings.readmeHeading !== undefined && csvReadmeHeadingSelect) {
+				csvReadmeHeadingSelect.value = settings.readmeHeading;
+				csvState.settings.readmeHeadingStyle = settings.readmeHeading;
+			}
+		}
+	} catch (e) { }
+}
+
+if (csvFolderNumberCheck) {
+	csvFolderNumberCheck.addEventListener('change', () => {
+		csvState.settings.useFolderNumber = csvFolderNumberCheck.checked;
+		saveCsvSettings();
+		updateCsvPreview();
+	});
+}
+
+if (csvReadmeHeadingSelect) {
+	csvReadmeHeadingSelect.addEventListener('change', () => {
+		csvState.settings.readmeHeadingStyle = csvReadmeHeadingSelect.value;
+		saveCsvSettings();
+		updateCsvPreview();
+	});
+}
+
+// 初期化時に設定を読み込む
+loadCsvSettings();
 
 lucide.createIcons();

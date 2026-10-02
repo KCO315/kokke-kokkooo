@@ -1740,3 +1740,39 @@ body.chromakey-mode .text-preview-content {
   /* クリックを貫通させて、下のリストを操作できるようにする */
   pointer-events: none;
 }
+
+/* =========================================
+   6. レスポンシブ対応 (スマホ・タブレット非対応案内)
+========================================= */
+.mobile-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #f9fdfb;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 768px以下の画面幅（スマホやタブレットの縦向きなど）で案内を表示 */
+@media screen and (max-width: 768px) {
+  .mobile-warning {
+    display: flex;
+  }
+
+  /* 案内表示中はメインのUI要素を非表示にする */
+  #activity-bar,
+  #content-area,
+  #global-settings-modal-overlay {
+    display: none !important;
+  }
+}

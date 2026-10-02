@@ -78,6 +78,20 @@
 					<div id="csv-column-checkboxes"></div>
 				</div>
 
+				<!-- 見出しスタイル -->
+				<div class="csv-box">
+					<label class="csv-label" style="display: flex; align-items: center; gap: 6px;">
+						<i data-lucide="heading" style="width: 16px; height: 16px;"></i>見出しスタイル
+					</label>
+					<p class="csv-note">見出しの装飾を変更できます</p>
+					<select id="csv-readme-heading" class="csv-select">
+						<option value="none" selected>スタイルなし</option>
+						<option value="bracket">【見出し】</option>
+						<option value="hash"># 見出し</option>
+						<option value="line">―― 見出し ――</option>
+					</select>
+				</div>
+
 				<!-- URLの表記方法 -->
 				<div class="csv-box">
 					<label class="csv-label" style="display: flex; align-items: center; gap: 6px;">
@@ -94,13 +108,28 @@
 				<!-- カテゴリ設定エリア -->
 				<div class="csv-box">
 					<label class="csv-label" style="display: flex; align-items: center; gap: 6px;">
-						<i data-lucide="tag" style="width: 16px; height: 16px;"></i>ジャンル設定（任意）
+						<i data-lucide="tag" style="width: 16px; height: 16px;"></i>ジャンル設定
 					</label>
 					<p class="csv-note">フォルダの先頭に表示されます。研究の分類、発表順の整理、自分用のメモなどに使えます</p>
 					<input type="text" id="csv-tag-input" class="csv-select" placeholder="例：泥団子,◯日目,要連絡"
 						autocomplete="off">
 					<div id="category-history-container"
 						style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;"></div>
+				</div>
+
+				<!-- フォルダ名に連番を付ける -->
+				<div class="csv-box" style="margin-top: 25px;">
+					<label class="csv-label"
+						style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+						<span style="display: flex; align-items: center; gap: 6px;">
+							<i data-lucide="list-ordered" style="width: 16px; height: 16px;"></i>フォルダ名に連番を付ける
+						</span>
+						<label class="toggle-switch">
+							<input type="checkbox" id="csv-folder-number" checked>
+							<span class="toggle-slider"></span>
+						</label>
+					</label>
+					<p class="csv-note">出力するフォルダ名に (001, 002...) を付与します</p>
 				</div>
 
 				<div class="csv-box">
@@ -116,6 +145,7 @@
 						<div id="csv-filename-checkboxes"></div>
 					</div>
 				</div>
+
 			</div>
 		</div>
 
@@ -136,30 +166,24 @@
 		</div>
 
 		<div class="csv-preview-container">
-			<!-- 修正：style属性に max-width: 100%; と flex-shrink: 1; を設定 -->
-			<div class="csv-card" style="width: 1024px; max-width: 100%; height: 768px; flex-shrink: 0;">
-				<!-- 修正：ヘッダーを左右分割し、リセットボタンを追加 -->
+			<div class="csv-card" style="flex: 7; height: 768px; min-width: 0;">
 				<div class="csv-card-header" style="justify-content: space-between;">
 					<div style="display: flex; align-items: center; gap: 8px;">
 						<i data-lucide="file-text" style="width:16px; height:16px;"></i> ファイル内容
 					</div>
-					<!-- 追加：リセットボタン -->
 					<button id="csv-reset-btn" class="csv-icon-btn"
 						style="font-size: 12px; padding: 2px 8px; margin: 0;">
 						<i data-lucide="rotate-ccw" style="width:14px; height:14px;"></i> 編集リセット
 					</button>
 				</div>
-				<!-- 修正：contenteditable="true" とアウトライン無効化のスタイルを追加 -->
 				<div id="csv-preview-content" contenteditable="true" style="outline: none;">
 					左側のメニューからCSVファイルをアップロードしてください<br></div>
 			</div>
-			<!-- 修正：こちらも max-width: 100%; と flex-shrink: 1; を設定 -->
-			<div class="csv-card" style="width: 300px; max-width: 100%; height: 768px; flex-shrink: 1;">
+			<div class="csv-card" style="flex: 2; height: 768px; min-width: 0;">
 				<div class="csv-card-header" style="justify-content: space-between;">
 					<div style="display: flex; align-items: center; gap: 8px;">
 						<i data-lucide="list-tree" style="width:16px; height:16px;"></i> 生成ファイル構成
 					</div>
-					<!-- 追加：ファイル追加ボタン -->
 					<label id="csv-add-file-btn" class="csv-icon-btn"
 						style="font-size: 12px; padding: 2px 8px; margin: 0; cursor: pointer; font-weight: normal;">
 						<i data-lucide="plus" style="width:14px; height:14px;"></i> ファイル追加
@@ -168,6 +192,7 @@
 				</div>
 				<div id="csv-tree-container">CSVアップロード後に表示<br>（ドラッグ＆ドロップでファイル追加可能）</div>
 			</div>
+			<div style="flex: 1; min-width: 0;"></div>
 		</div>
 
 		<script src="js/folder-generation.js"></script>
