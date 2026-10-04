@@ -613,6 +613,10 @@ if (loadBtn && folderInput) {
 folderInput.addEventListener('change', (event) => {
 	const files = Array.from(event.target.files);
 	listContainer.innerHTML = '';
+
+	// フォルダ読み込み時にグレーアウトを解除する
+	listContainer.classList.remove('disabled-controls');
+
 	activeGroupName = "";
 	clearInterval(timerInterval); secondsElapsed = 0; updateTimerDisplay();
 

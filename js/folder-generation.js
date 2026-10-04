@@ -80,6 +80,8 @@ function loadCsvFile(file) {
 
 			if (csvState.csvData.length > 0) {
 				csvControls.classList.remove('hidden');
+				csvControls.classList.remove('disabled-controls');
+
 				csvDownloadArea.classList.remove('hidden');
 				const hint = document.getElementById('csv-empty-hint');
 				if (hint) hint.style.display = 'none';
@@ -621,12 +623,14 @@ function updateCsvPreview() {
 
 				if (csvState.csvData.length === 0) {
 					// 全て削除された場合は初期状態に戻す
-					csvControls.classList.add('hidden');
+					csvControls.classList.add('disabled-controls');
 					csvDownloadArea.classList.add('hidden');
 					document.getElementById('csv-empty-hint').style.display = 'block';
-					csvPreviewFolderName.textContent = '未選択';
 
-					// 追加：初期状態に戻す時は pre-wrap を無効化する
+					// ダミー表示を復元する
+					resetCsvControlsToDummy();
+
+					csvPreviewFolderName.textContent = '未選択';
 					csvPreviewContent.classList.remove('is-loaded');
 
 					// 修正：テキストだけでなく、リンク付きの初期HTMLを入れ直す
@@ -872,5 +876,41 @@ if (csvReadmeHeadingSelect) {
 
 // 初期化時に設定を読み込む
 loadCsvSettings();
+
+// --- ダミーUIへの復元処理 ---
+function resetCsvControlsToDummy() {
+	csvRowSelect.innerHTML = '<option>001 - ダミーデータ</option>';
+	csvColumnCheckboxes.innerHTML = `
+		<label class="csv-check-item csv-check-item-hidden">
+			<span style="text-decoration: line-through;">タイムスタンプ</span>
+			<i data-lucide="eye-off" style="width:16px; height:16px;"></i>
+		</label>
+		<label class="csv-check-item csv-check-item-default">
+			<span>タイトル</span>
+			<i data-lucide="eye" style="width:16px; height:16px;"></i>
+		</label>`;
+	csvFilenameCheckboxes.innerHTML = `
+		<label class="csv-check-item csv-drag-item csv-check-item-active">
+			<div style="display:flex; align-items:center; gap:8px;">
+				<i data-lucide="grip-vertical" style="width:14px; height:14px; color:#999;"></i>
+				<span>タイトル</span>
+			</div>
+			<i data-lucide="check-circle-2" style="width:16px; height:16px;"></i>
+		</label>
+		<label class="csv-check-item csv-drag-item csv-check-item-default">
+			<div style="display:flex; align-items:center; gap:8px;">
+				<i data-lucide="grip-vertical" style="width:14px; height:14px; color:#999;"></i>
+				<span>質問など</span>
+			</div>
+			<i data-lucide="circle" style="width:16px; height:16px;"></i>
+		</label>`;
+	const catHistory = document.getElementById('category-history-container');
+	if (catHistory) {
+		catHistory.innerHTML = `
+			<span style="font-size: 11px; padding: 4px 10px; background-color: #e0f2ec; color: #007b5e; border-radius: 12px; border: 1px solid #b0d4c8;">カテゴリA</span>
+			<span style="font-size: 11px; padding: 4px 10px; background-color: #e0f2ec; color: #007b5e; border-radius: 12px; border: 1px solid #b0d4c8;">カテゴリB</span>`;
+	}
+	lucide.createIcons({ root: csvControls });
+}
 
 lucide.createIcons();

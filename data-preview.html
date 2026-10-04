@@ -68,9 +68,49 @@
 				</div>
 			</div>
 
-			<div id="list-container" style="padding: 0 15px 15px 15px;">
-				<p class="hide-on-collapse" style="font-size: 13px; color: #555;">
-					上のボタンからフォルダを読み込むと、ここにリストが並びます。</p>
+			<!-- 初期は disabled-controls を付与 -->
+			<div id="list-container" class="disabled-controls" style="padding: 0 15px 15px 15px;">
+				<div class="group-container">
+					<h4 class="group-title">
+						<span class="group-title-full">
+							<span class="group-icon-wrapper">
+								<i data-lucide="folder" style="width:22px; height:22px;"></i>
+								<span class="group-number">1</span>
+							</span>
+							【#カテゴリ】サンプル
+						</span>
+						<span class="group-title-short">【#カ</span>
+						<button class="group-toggle-btn"><i data-lucide="chevron-up"></i></button>
+					</h4>
+					<button class="list-item active">
+						<span class="item-icon"><i data-lucide="file-text"
+								style="width:18px;height:18px; color:#333;"></i></span>
+						<span class="item-text">README-サンプル.txt</span>
+					</button>
+					<button class="list-item">
+						<span class="item-icon"><i data-lucide="link"
+								style="width:18px;height:18px; color:#333;"></i></span>
+						<span class="item-text">URL-01__example-com.txt</span>
+					</button>
+				</div>
+				<div class="group-container collapsed-group" style="margin-top: 15px;">
+					<h4 class="group-title">
+						<span class="group-title-full">
+							<span class="group-icon-wrapper">
+								<i data-lucide="folder" style="width:22px; height:22px;"></i>
+								<span class="group-number">2</span>
+							</span>
+							【#カテゴリ】サンプル
+						</span>
+						<span class="group-title-short">タイ</span>
+						<button class="group-toggle-btn"><i data-lucide="chevron-down"></i></button>
+					</h4>
+					<button class="list-item">
+						<span class="item-icon"><i data-lucide="file-text"
+								style="width:18px;height:18px; color:#333;"></i></span>
+						<span class="item-text">README-タイトルのみ.txt</span>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

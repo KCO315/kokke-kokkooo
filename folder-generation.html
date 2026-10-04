@@ -51,12 +51,9 @@
 							data-lucide="external-link"
 							style="width:14px; height:14px; margin-left: 2px; vertical-align: middle;"></i></a>
 				</div>
-				<p id="csv-empty-hint" style="font-size: 13px; color: #555; margin: 12px 0 0 0; line-height: 1.4;">
-					CSVを読み込むと、ここに操作ボタンが表示されます
-				</p>
 			</div>
 
-			<div id="csv-controls" class="hidden" style="padding: 15px;">
+			<div id="csv-controls" class="disabled-controls" style="padding: 15px;">
 				<div class="csv-box">
 					<label class="csv-label" style="display: flex; align-items: center; gap: 6px;">
 						<i data-lucide="list" style="width: 16px; height: 16px;"></i>回答リスト
@@ -64,7 +61,9 @@
 					<div style="display: flex; gap: 8px; align-items: center;">
 						<button id="csv-prev-btn" class="csv-icon-btn"><i data-lucide="chevron-left"
 								style="width:16px; height:16px;"></i></button>
-						<select id="csv-row-select" class="csv-select"></select>
+						<select id="csv-row-select" class="csv-select">
+							<option>001 - サンプル</option>
+						</select>
 						<button id="csv-next-btn" class="csv-icon-btn"><i data-lucide="chevron-right"
 								style="width:16px; height:16px;"></i></button>
 					</div>
@@ -75,7 +74,17 @@
 						<i data-lucide="eye-off" style="width: 16px; height: 16px;"></i>非表示にする項目
 					</label>
 					<p class="csv-note">配信に映したくない項目を非表示にできます</p>
-					<div id="csv-column-checkboxes"></div>
+					<div id="csv-column-checkboxes">
+						<!-- ダミーのチェックボックス -->
+						<label class="csv-check-item csv-check-item-hidden">
+							<span style="text-decoration: line-through;">タイムスタンプ</span>
+							<i data-lucide="eye-off" style="width:16px; height:16px;"></i>
+						</label>
+						<label class="csv-check-item csv-check-item-default">
+							<span>タイトル</span>
+							<i data-lucide="eye" style="width:16px; height:16px;"></i>
+						</label>
+					</div>
 				</div>
 
 				<!-- 見出しスタイル -->
@@ -85,10 +94,10 @@
 					</label>
 					<p class="csv-note">見出しの装飾を変更できます</p>
 					<select id="csv-readme-heading" class="csv-select">
-						<option value="none" selected>スタイルなし</option>
-						<option value="bracket">【見出し】</option>
+						<option value="bracket" selected>【見出し】</option>
 						<option value="hash"># 見出し</option>
 						<option value="line">―― 見出し ――</option>
+						<option value="none">スタイルなし</option>
 					</select>
 				</div>
 
@@ -108,13 +117,49 @@
 				<!-- カテゴリ設定エリア -->
 				<div class="csv-box">
 					<label class="csv-label" style="display: flex; align-items: center; gap: 6px;">
-						<i data-lucide="tag" style="width: 16px; height: 16px;"></i>ジャンル設定
+						<i data-lucide="tag" style="width: 16px; height: 16px;"></i>ジャンル設定（任意）
 					</label>
-					<p class="csv-note">フォルダの先頭に表示されます。研究の分類、発表順の整理、自分用のメモなどに使えます</p>
+					<p class="csv-note">フォルダの先頭に表示されます。研究の分類、発表順の整理などに使えます</p>
 					<input type="text" id="csv-tag-input" class="csv-select" placeholder="例：泥団子,◯日目,要連絡"
 						autocomplete="off">
 					<div id="category-history-container"
-						style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;"></div>
+						style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+						<!-- ダミーの履歴 -->
+						<span
+							style="font-size: 11px; padding: 4px 10px; background-color: #e0f2ec; color: #007b5e; border-radius: 12px; border: 1px solid #b0d4c8;">カテゴリA</span>
+						<span
+							style="font-size: 11px; padding: 4px 10px; background-color: #e0f2ec; color: #007b5e; border-radius: 12px; border: 1px solid #b0d4c8;">カテゴリB</span>
+					</div>
+				</div>
+
+				<div class="csv-box">
+					<button id="csv-filename-accordion-btn" class="csv-accordion-btn">
+						<span style="display: flex; align-items: center; gap: 6px;">
+							<i data-lucide="folder-edit" style="width: 16px; height: 16px;"></i>ファイル名に含める項目
+						</span>
+						<i data-lucide="chevron-down" id="csv-filename-accordion-icon"
+							style="transition: transform 0.2s;"></i>
+					</button>
+					<div id="csv-filename-accordion-content">
+						<p class="csv-note">ONにすると、フォルダ名に反映されます。ドラッグで順序を変えられます</p>
+						<div id="csv-filename-checkboxes">
+							<!-- ダミーのファイル名項目 -->
+							<label class="csv-check-item csv-drag-item csv-check-item-active">
+								<div style="display:flex; align-items:center; gap:8px;">
+									<i data-lucide="grip-vertical" style="width:14px; height:14px; color:#999;"></i>
+									<span>タイトル</span>
+								</div>
+								<i data-lucide="check-circle-2" style="width:16px; height:16px;"></i>
+							</label>
+							<label class="csv-check-item csv-drag-item csv-check-item-default">
+								<div style="display:flex; align-items:center; gap:8px;">
+									<i data-lucide="grip-vertical" style="width:14px; height:14px; color:#999;"></i>
+									<span>質問など</span>
+								</div>
+								<i data-lucide="circle" style="width:16px; height:16px;"></i>
+							</label>
+						</div>
+					</div>
 				</div>
 
 				<!-- フォルダ名に連番を付ける -->
@@ -131,21 +176,6 @@
 					</label>
 					<p class="csv-note">出力するフォルダ名に (001, 002...) を付与します</p>
 				</div>
-
-				<div class="csv-box">
-					<button id="csv-filename-accordion-btn" class="csv-accordion-btn">
-						<span style="display: flex; align-items: center; gap: 6px;">
-							<i data-lucide="folder-edit" style="width: 16px; height: 16px;"></i>ファイル名に含める項目
-						</span>
-						<i data-lucide="chevron-down" id="csv-filename-accordion-icon"
-							style="transition: transform 0.2s;"></i>
-					</button>
-					<div id="csv-filename-accordion-content" class="hidden">
-						<p class="csv-note">ONにすると、フォルダ名に反映されます。ドラッグで順序を変えられます</p>
-						<div id="csv-filename-checkboxes"></div>
-					</div>
-				</div>
-
 			</div>
 		</div>
 

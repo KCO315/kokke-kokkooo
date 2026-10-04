@@ -84,6 +84,14 @@ body {
   display: none !important;
 }
 
+/* 操作無効（ダミー表示）時のスタイル */
+.disabled-controls {
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+  filter: grayscale(80%);
+}
+
 /* =========================================
    3. メイン画面固有 (index.html)
 ========================================= */
