@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta name="robots" content="noindex">
+	<meta charset="UTF-8">
+	<title>セットリスト │ 発表配信ツール コッケコッコー!!!</title>
+	<script src="https://unpkg.com/lucide@0.292.0/dist/umd/lucide.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<style>
+		body {
+			background-color: #f9fdfb !important;
+			padding: 40px;
+			color: #333;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			margin: 0;
+			overflow-x: hidden;
+		}
+
+		.top-bar {
+			display: flex;
+			align-items: center;
+			background-color: #ffffff;
+			border: 1px solid #e0e0e0;
+			border-radius: 999px;
+			/* 角丸のコンテナ */
+			padding: 8px 16px;
+			gap: 16px;
+			max-width: 1200px;
+			margin: 0 auto 30px auto;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+		}
+
+		.top-bar-divider {
+			width: 1px;
+			height: 24px;
+			background-color: #e0e0e0;
+			margin: 0 4px;
+		}
+
+		.btn-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.mode-btn,
+		.export-btn {
+			padding: 8px 16px;
+			border: 1px solid #ccc;
+			background-color: #fff;
+			color: #333;
+			font-weight: bold;
+			font-size: 13px;
+			border-radius: 20px;
+			/* ボタンも角丸に */
+			cursor: pointer;
+			transition: all 0.1s;
+			box-sizing: border-box;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 36px;
+		}
+
+		.mode-btn.active {
+			background-color: #333;
+			color: #fff;
+			border-color: #333;
+		}
+
+		.mode-btn:hover,
+		.export-btn:hover {
+			background-color: #f5f5f5;
+		}
+
+		.mode-btn.active:hover {
+			background-color: #444;
+		}
+
+		.checkbox-label {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			font-size: 13px;
+			font-weight: bold;
+			color: #555;
+			cursor: pointer;
+		}
+
+		.is-exporting .cell-input::placeholder {
+			color: transparent !important;
+		}
+
+		#setlist-container {
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		.table-outer-wrapper {
+			width: 100%;
+			overflow-x: auto;
+			/* ボタンが外にはみ出しても切れないようにパディングを確保 */
+			padding: 16px 16px 16px 60px;
+			margin: -16px -16px -16px -60px;
+		}
+
+		table {
+			width: max-content;
+			min-width: 100%;
+			border-collapse: separate;
+			border-spacing: 0;
+			table-layout: fixed;
+			border: 2px solid #a6e0cf;
+			border-radius: 8px;
+			background-color: #ffffff;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+		}
+
+		th,
+		td {
+			border-bottom: 1px solid #b0d4c8;
+			border-right: 1px solid #b0d4c8;
+			padding: 0;
+			font-size: 14px;
+			position: relative;
+			background: #fff;
+		}
+
+		th:last-child,
+		td:last-child {
+			border-right: none;
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
+
+		th:first-child {
+			border-top-left-radius: 6px;
+		}
+
+		th:last-child {
+			border-top-right-radius: 6px;
+		}
+
+		tr:last-child td:first-child {
+			border-bottom-left-radius: 6px;
+		}
+
+		tr:last-child td:last-child {
+			border-bottom-right-radius: 6px;
+		}
+
+		th {
+			background-color: #c5ebdf;
+			font-weight: bold;
+			padding: 12px 16px;
+			text-align: left;
+			color: #333;
+			position: relative;
+			z-index: 1;
+		}
+
+		/* ホバー中の列を最前面にして「＋」ボタンが隣の列に隠れないようにする */
+		th:hover {
+			z-index: 10;
+		}
+
+		.th-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding-right: 8px;
+		}
+
+		.delete-col-btn {
+			background: none;
+			border: none;
+			cursor: pointer;
+			color: #7ab3a2;
+			padding: 2px;
+			display: none;
+		}
+
+		th:hover .delete-col-btn {
+			display: block;
+		}
+
+		.delete-col-btn:hover {
+			color: #e74c3c;
+		}
+
+		/* 列と列の間の「＋」ボタン */
+		.add-col-trigger {
+			position: absolute;
+			right: -12px;
+			top: -12px;
+			width: 24px;
+			height: 24px;
+			background-color: #328f74;
+			color: white;
+			border-radius: 50%;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			z-index: 100;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+		}
+
+		th:hover .add-col-trigger {
+			display: flex;
+		}
+
+		/* 列リサイズ用ハンドル */
+		.resizer {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			width: 6px;
+			cursor: col-resize;
+			user-select: none;
+			z-index: 5;
+		}
+
+		.resizer:hover,
+		.resizer.resizing {
+			background-color: #328f74;
+		}
+
+		/* 行操作ボタングループ（表の外側に配置） */
+		.row-controls {
+			position: absolute;
+			left: -52px;
+			top: 50%;
+			transform: translateY(-50%);
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			opacity: 0;
+			transition: opacity 0.2s;
+			z-index: 10;
+		}
+
+		.draggable-row:hover .row-controls {
+			opacity: 1;
+		}
+
+		.drag-handle {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: #ccc;
+			cursor: grab;
+			padding: 2px;
+			flex-shrink: 0;
+		}
+
+		.drag-handle:active {
+			cursor: grabbing;
+		}
+
+		.drag-handle:hover {
+			color: #888;
+		}
+
+		.delete-row-btn {
+			flex-shrink: 0;
+			background: #fff;
+			border: 1px solid #e0e0e0;
+			color: #e74c3c;
+			cursor: pointer;
+			border-radius: 50%;
+			padding: 2px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		}
+
+		.delete-row-btn:hover {
+			background: #fef2f2;
+			border-color: #fca5a5;
+		}
+
+		.cell-content-wrapper {
+			display: flex;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+		}
+
+		.cell-input {
+			flex: 1;
+			width: 100%;
+			display: block;
+			height: 100%;
+			border: 2px solid transparent;
+			background: transparent;
+			padding: 12px 8px;
+			box-sizing: border-box;
+			font-size: 14px;
+			outline: none;
+			color: #333;
+			min-width: 0;
+		}
+
+		.cell-input:hover {
+			background: #eaf8f4;
+		}
+
+		.cell-input:focus {
+			border-color: #328f74;
+			background: #fff;
+		}
+
+		.status-select {
+			width: 100%;
+			height: 100%;
+			border: 2px solid transparent;
+			background: transparent;
+			padding: 12px 12px;
+			font-size: 14px;
+			outline: none;
+			cursor: pointer;
+			appearance: none;
+		}
+
+		.status-select:hover {
+			background: #eaf8f4;
+		}
+
+		.status-select:focus {
+			border-color: #328f74;
+		}
+
+		.status-select.done {
+			background: #fece00;
+			color: #333;
+			border-color: #dcb800;
+			font-weight: bold;
+		}
+
+		/* ドロップダウンメニュー */
+		.col-dropdown {
+			position: absolute;
+			background: #fff;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			z-index: 9999;
+			display: none;
+			flex-direction: column;
+			min-width: 150px;
+			padding: 4px 0;
+		}
+
+		.col-dropdown.show {
+			display: flex;
+		}
+
+		.col-dropdown-item {
+			padding: 8px 16px;
+			cursor: pointer;
+			font-size: 13px;
+		}
+
+		.col-dropdown-item:hover {
+			background-color: #eaf8f4;
+			color: #007b5e;
+			font-weight: bold;
+		}
+
+		/* 行追加用「＋」ボタン (行の左下、枠線の上に表示) */
+		.add-row-trigger {
+			position: absolute;
+			left: -12px;
+			bottom: -12px;
+			width: 24px;
+			height: 24px;
+			background-color: #328f74;
+			color: white;
+			border-radius: 50%;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			z-index: 100;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+		}
+
+		.add-row-trigger:hover {
+			background-color: #27725c;
+		}
+
+		.draggable-row:hover .add-row-trigger {
+			display: flex;
+		}
+
+		.draggable-row:hover td {
+			z-index: 10;
+		}
+
+		.draggable-row {
+			cursor: grab;
+		}
+
+		.draggable-row:active {
+			cursor: grabbing;
+		}
+
+		/* ドラッグ中の元の行をグレーのプレースホルダーにする */
+		.draggable-row.dragging td {
+			background-color: #f0f0f0 !important;
+			border-color: #d1d5db !important;
+		}
+
+		.draggable-row.dragging td * {
+			visibility: hidden;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="top-bar">
+		<div class="btn-row">
+			<span style="font-size: 12px; font-weight: bold; color: #888; margin-right: 4px;">読み込み
+			</span>
+			<button id="mode-prepare" class="mode-btn active" onclick="setMode('prepare')">準備モード</button>
+			<label class="mode-btn" style="cursor:pointer;">
+				<input type="file" id="csv-upload" accept=".csv" style="display:none;"
+					onchange="handleCsvUpload(event)">
+				CSVアップロード
+			</label>
+		</div>
+
+		<div class="top-bar-divider"></div>
+
+		<div class="btn-row">
+			<span style="font-size: 12px; font-weight: bold; color: #888; margin-right: 4px;">表示設定</span>
+			<label class="checkbox-label">
+				<input type="checkbox" id="show-status-cb" checked onchange="toggleColumns()"> ステータス
+			</label>
+			<label class="checkbox-label">
+				<input type="checkbox" id="show-note-cb" checked onchange="toggleColumns()"> 備考
+			</label>
+		</div>
+
+		<div style="flex-grow: 1;"></div>
+
+		<div class="btn-row">
+			<span style="font-size: 12px; font-weight: bold; color: #888; margin-right: 4px;">ダウンロード
+			</span>
+			<button class="export-btn" id="export-png-btn">PNG</button>
+			<button class="export-btn" id="export-csv-btn">CSV</button>
+		</div>
+	</div>
+
+	<div id="setlist-container"></div>
+
+	<!-- 独立したドロップダウンメニュー -->
+	<div id="col-menu" class="col-dropdown"></div>
+
+	<script>
+		let currentMode = 'prepare';
+		let previousMode = null;
+		let allHeaders = [];
+		let selectedColumns = [];
+		let tableData = [];
+		let columnWidths = { 'ステータス': 130, '備考': 250 };
+		let dragSourceIndex = null;
+		let insertColIndex = null;
+
+		// 表示設定の変数
+		let showStatus = true;
+		let showNote = true;
+
+		// 表示設定の切り替え
+		function toggleColumns() {
+			showStatus = document.getElementById('show-status-cb').checked;
+			showNote = document.getElementById('show-note-cb').checked;
+			renderTable();
+		}
+
+		window.addEventListener('message', (event) => {
+			if (event.data === 'tabOpened' && currentMode === 'prepare') {
+				loadData();
+			}
+		});
+
+		function setMode(mode) {
+			currentMode = mode;
+			document.getElementById('mode-prepare').classList.toggle('active', mode === 'prepare');
+			loadData();
+		}
+
+		function getInitialColumn() {
+			return allHeaders.find(h => h.includes('タイトル')) || allHeaders[0];
+		}
+
+		function loadData() {
+			if (currentMode === 'prepare') {
+				const saved = localStorage.getItem('kokekokkoSetlistData');
+				if (saved) {
+					const parsed = JSON.parse(saved);
+					allHeaders = parsed.headers || [];
+					if (previousMode !== currentMode) {
+						selectedColumns = allHeaders.length > 0 ? [getInitialColumn()] : [];
+						selectedColumns.forEach(c => columnWidths[c] = 300);
+					}
+
+					const oldDataMap = new Map();
+					if (previousMode === currentMode) {
+						tableData.forEach((item, idx) => oldDataMap.set(idx, item));
+					}
+
+					tableData = (parsed.data || []).map((row, idx) => {
+						const oldItem = oldDataMap.get(idx);
+						return {
+							id: oldItem ? oldItem.id : Date.now() + idx,
+							type: oldItem ? oldItem.type : 'row',
+							text: oldItem ? oldItem.text : '',
+							originalData: row,
+							status: oldItem ? oldItem.status : '未発表',
+							note: oldItem ? oldItem.note : ''
+						};
+					});
+				} else {
+					allHeaders = []; selectedColumns = []; tableData = [];
+				}
+			}
+			previousMode = currentMode;
+			renderTable();
+		}
+
+		function handleCsvUpload(e) {
+			const file = e.target.files[0];
+			if (!file) return;
+
+			Papa.parse(file, {
+				header: true,
+				skipEmptyLines: true,
+				complete: function (results) {
+					allHeaders = results.meta.fields || [];
+					selectedColumns = allHeaders.length > 0 ? [getInitialColumn()] : [];
+					selectedColumns.forEach(c => columnWidths[c] = 300);
+
+					tableData = results.data.map((row, idx) => ({
+						id: Date.now() + idx,
+						type: 'row',
+						text: '',
+						originalData: row,
+						status: '未発表',
+						note: ''
+					}));
+
+					currentMode = 'upload';
+					previousMode = 'upload';
+					document.getElementById('mode-prepare').classList.remove('active');
+					renderTable();
+					e.target.value = '';
+				}
+			});
+		}
+
+		function updateValue(itemIndex, key, value) {
+			if (key === 'status' || key === 'note') {
+				tableData[itemIndex][key] = value;
+			} else {
+				tableData[itemIndex].originalData[key] = value;
+			}
+			if (key === 'status') renderTable();
+		}
+
+		function updateSectionValue(itemIndex, value) {
+			tableData[itemIndex].text = value;
+		}
+
+		function handleEnterKey(event, idx) {
+			if (event.isComposing) return;
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				addNormalRow(idx + 1);
+				setTimeout(() => {
+					const row = document.querySelector(`tr[data-index="${idx + 1}"]`);
+					if (row) {
+						const input = row.querySelector('.cell-input');
+						if (input) input.focus();
+					}
+				}, 50);
+			}
+		}
+
+		function toggleColMenu(event, idx) {
+			insertColIndex = idx;
+			const menu = document.getElementById('col-menu');
+			if (menu.classList.contains('show')) {
+				menu.classList.remove('show');
+			} else {
+				const available = allHeaders.filter(h => !selectedColumns.includes(h));
+				if (available.length > 0) {
+					menu.innerHTML = available.map(h => `<div class="col-dropdown-item" onclick="addColumn('${h}')">${h}</div>`).join('');
+					menu.classList.add('show');
+
+					const rect = event.currentTarget.getBoundingClientRect();
+					menu.style.left = (rect.left + window.scrollX - 50) + 'px';
+					menu.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+				} else {
+					menu.innerHTML = `<div class="col-dropdown-item" style="color:#999;">追加できる項目がありません</div>`;
+					menu.classList.add('show');
+					const rect = event.currentTarget.getBoundingClientRect();
+					menu.style.left = (rect.left + window.scrollX - 50) + 'px';
+					menu.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+				}
+			}
+			event.stopPropagation();
+		}
+
+		document.addEventListener('click', () => {
+			const menu = document.getElementById('col-menu');
+			if (menu) menu.classList.remove('show');
+		});
+
+		function addColumn(colName) {
+			columnWidths[colName] = 200;
+			selectedColumns.splice(insertColIndex, 0, colName);
+			renderTable();
+		}
+
+		function removeColumn(colName) {
+			selectedColumns = selectedColumns.filter(c => c !== colName);
+			renderTable();
+		}
+
+		function addNormalRow(insertIndex) {
+			const newRow = { id: Date.now(), type: 'row', text: '', originalData: {}, status: '未発表', note: '' };
+			if (typeof insertIndex === 'number') {
+				tableData.splice(insertIndex, 0, newRow);
+			} else {
+				tableData.push(newRow);
+			}
+			renderTable();
+		}
+
+		function addSectionRow(insertIndex) {
+			const newRow = { id: Date.now(), type: 'section', text: '', originalData: {}, status: '未発表', note: '' };
+			if (typeof insertIndex === 'number') {
+				tableData.splice(insertIndex, 0, newRow);
+			} else {
+				tableData.push(newRow);
+			}
+			renderTable();
+		}
+
+		function deleteRow(index) {
+			tableData.splice(index, 1);
+			renderTable();
+		}
+
+		function renderTable() {
+			const container = document.getElementById('setlist-container');
+
+			if (allHeaders.length === 0 && tableData.length === 0) {
+				allHeaders = ['タイトル'];
+				selectedColumns = ['タイトル'];
+				columnWidths['タイトル'] = 300;
+				tableData = [];
+			}
+
+			let thHtml = selectedColumns.map((col, idx) => `
+				<th data-colname="${col}" style="width: ${columnWidths[col] || 300}px; min-width: ${columnWidths[col] || 300}px;">
+					<div class="th-content">
+						<span>${col}</span>
+						<button class="delete-col-btn" onclick="removeColumn('${col}')" title="列を削除"><i data-lucide="x" style="width:14px; height:14px;"></i></button>
+					</div>
+					<div class="add-col-trigger" onclick="toggleColMenu(event, ${idx + 1})" title="右に列を追加"><i data-lucide="plus" style="width:14px;height:14px;"></i></div>
+					<div class="resizer"></div>
+				</th>
+			`).join('');
+
+			if (showStatus) {
+				thHtml += `
+					<th data-colname="ステータス" style="width: ${columnWidths['ステータス'] || 130}px; min-width: ${columnWidths['ステータス'] || 130}px;">
+						<div class="th-content">ステータス</div>
+						<div class="add-col-trigger" onclick="toggleColMenu(event, ${selectedColumns.length + 1})" title="右に列を追加"><i data-lucide="plus" style="width:14px;height:14px;"></i></div>
+						<div class="resizer"></div>
+					</th>`;
+			}
+			if (showNote) {
+				thHtml += `
+					<th data-colname="備考" style="width: ${columnWidths['備考'] || 250}px; min-width: ${columnWidths['備考'] || 250}px;">
+						<div class="th-content">備考</div>
+						<div class="resizer"></div>
+					</th>`;
+			}
+
+			let trHtml = tableData.map((item, idx) => {
+				if (item.type === 'section') {
+					let colspan = selectedColumns.length;
+					if (showStatus) colspan++;
+					if (showNote) colspan++;
+
+					return `
+						<tr class="draggable-row" data-index="${idx}" draggable="true">
+							<td colspan="${colspan}" style="position: relative; background-color: #c5ebdf; padding: 0;">
+								<div class="row-controls">
+									<button class="delete-row-btn" onclick="deleteRow(${idx})" title="行を削除"><i data-lucide="minus" style="width:12px;height:12px;"></i></button>
+									<span class="drag-handle" title="ドラッグして並べ替え"><i data-lucide="grip-vertical" style="width:14px;height:14px;"></i></span>
+								</div>
+								<div class="add-row-trigger" onclick="addSectionRow(${idx + 1})" title="下に連結行を追加"><i data-lucide="plus" style="width:14px;height:14px;"></i></div>
+								<div class="cell-content-wrapper" style="padding: 0;">
+									<input type="text" class="cell-input" value="${item.text || ''}" placeholder="（見出しを入力）" onchange="updateSectionValue(${idx}, this.value)" onkeydown="handleEnterKey(event, ${idx})" style="font-weight: bold; background: transparent; padding-left: 16px;">
+								</div>
+							</td>
+						</tr>
+					`;
+				} else {
+					let tdHtml = selectedColumns.map((col, colIdx) => `
+						<td style="${colIdx === 0 ? 'position: relative;' : ''}">
+							${colIdx === 0 ? `
+								<div class="row-controls">
+									<button class="delete-row-btn" onclick="deleteRow(${idx})" title="行を削除"><i data-lucide="minus" style="width:12px;height:12px;"></i></button>
+									<span class="drag-handle" title="ドラッグして並べ替え"><i data-lucide="grip-vertical" style="width:14px;height:14px;"></i></span>
+								</div>
+								<div class="add-row-trigger" onclick="addSectionRow(${idx + 1})" title="下に連結行を追加"><i data-lucide="plus" style="width:14px;height:14px;"></i></div>
+							` : ''}
+							<div class="cell-content-wrapper">
+								<input type="text" class="cell-input" value="${item.originalData[col] || ''}" onchange="updateValue(${idx}, '${col}', this.value)" onkeydown="handleEnterKey(event, ${idx})">
+							</div>
+						</td>
+					`).join('');
+
+					if (showStatus) {
+						const isDone = item.status === '発表済み' ? 'done' : '';
+						tdHtml += `
+							<td>
+								<select class="status-select ${isDone}" onchange="updateValue(${idx}, 'status', this.value)">
+									<option value="未発表" ${item.status === '未発表' ? 'selected' : ''}>未発表</option>
+									<option value="発表済み" ${item.status === '発表済み' ? 'selected' : ''}>発表済み</option>
+								</select>
+							</td>`;
+					}
+					if (showNote) {
+						tdHtml += `
+							<td>
+								<input type="text" class="cell-input" style="padding-left:16px;" value="${item.note}" placeholder="" onchange="updateValue(${idx}, 'note', this.value)" onkeydown="handleEnterKey(event, ${idx})">
+							</td>`;
+					}
+					return `<tr class="draggable-row" data-index="${idx}" draggable="true">${tdHtml}</tr>`;
+				}
+			}).join('');
+
+			if (tableData.length === 0) {
+				let emptyColspan = selectedColumns.length + (showStatus ? 1 : 0) + (showNote ? 1 : 0);
+				trHtml = `<tr><td colspan="${emptyColspan}" style="text-align: center; padding: 20px; color: #999;">データがありません</td></tr>`;
+			}
+
+			container.innerHTML = `
+				<div class="table-outer-wrapper">
+					<table id="setlist-table">
+						<thead><tr>${thHtml}</tr></thead>
+						<tbody>${trHtml}</tbody>
+					</table>
+				</div>
+			`;
+
+			if (tableData.length === 0) {
+				container.innerHTML += `
+					<div style="margin-top: 16px; display: flex; align-items: center; gap: 8px;">
+						<button class="add-col-trigger" style="position: static; display: flex;" onclick="addNormalRow()" title="行を追加"><i data-lucide="plus" style="width:14px;height:14px;"></i></button>
+						<span style="font-size: 14px; color: #555; font-weight: bold; cursor: pointer;" onclick="addNormalRow()">行を追加</span>
+					</div>
+				`;
+			}
+
+			lucide.createIcons();
+			attachDragAndDropEvents();
+			attachResizers();
+		}
+
+		function attachResizers() {
+			const table = document.getElementById('setlist-table');
+			if (!table) return;
+			const cols = table.querySelectorAll('th');
+
+			cols.forEach(col => {
+				const resizer = col.querySelector('.resizer');
+				if (!resizer) return;
+				const colName = col.getAttribute('data-colname');
+
+				let startX, startWidth;
+				resizer.addEventListener('mousedown', (e) => {
+					startX = e.clientX;
+					startWidth = col.offsetWidth;
+					resizer.classList.add('resizing');
+
+					const onMouseMove = (e) => {
+						const newWidth = startWidth + (e.clientX - startX);
+						if (newWidth > 60) {
+							col.style.width = `${newWidth}px`;
+							col.style.minWidth = `${newWidth}px`;
+							columnWidths[colName] = newWidth;
+						}
+					};
+
+					const onMouseUp = () => {
+						resizer.classList.remove('resizing');
+						document.removeEventListener('mousemove', onMouseMove);
+						document.removeEventListener('mouseup', onMouseUp);
+					};
+
+					document.addEventListener('mousemove', onMouseMove);
+					document.addEventListener('mouseup', onMouseUp);
+				});
+			});
+		}
+
+		function attachDragAndDropEvents() {
+			document.querySelectorAll('.draggable-row').forEach(row => {
+				row.addEventListener('dragstart', (e) => {
+					dragSourceIndex = parseInt(row.getAttribute('data-index'));
+					e.dataTransfer.effectAllowed = 'move';
+					setTimeout(() => row.classList.add('dragging'), 0);
+				});
+
+				row.addEventListener('dragend', () => {
+					row.classList.remove('dragging');
+					// DOMの並び順を取得してデータを更新する
+					const newTableData = [];
+					document.querySelectorAll('#setlist-table tbody tr.draggable-row').forEach(r => {
+						const idx = parseInt(r.getAttribute('data-index'));
+						newTableData.push(tableData[idx]);
+					});
+					tableData = newTableData;
+					renderTable();
+				});
+
+				row.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					e.dataTransfer.dropEffect = 'move';
+
+					// ドラッグ中に重なった行の上か下へプレースホルダーを移動させる
+					const draggingRow = document.querySelector('.dragging');
+					if (!draggingRow || draggingRow === row) return;
+
+					const bounding = row.getBoundingClientRect();
+					const offset = bounding.y + (bounding.height / 2);
+					if (e.clientY - offset > 0) {
+						row.after(draggingRow);
+					} else {
+						row.before(draggingRow);
+					}
+				});
+
+				row.addEventListener('drop', (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+				});
+			});
+		}
+
+		document.getElementById('export-png-btn').addEventListener('click', async () => {
+			if (tableData.length === 0) return;
+			const tableWrapper = document.querySelector('.table-outer-wrapper');
+
+			tableWrapper.classList.add('is-exporting');
+			const canvas = await html2canvas(tableWrapper, { backgroundColor: "#ffffff", scale: 2 });
+			tableWrapper.classList.remove('is-exporting');
+
+			let drawW = canvas.width;
+			let drawH = canvas.height;
+
+			// 余白を上下左右100pxとする (両端で200px)
+			const margin = 100;
+
+			// 最大横幅を1280pxに設定
+			let targetW = drawW + (margin * 2);
+			if (targetW > 1280) {
+				targetW = 1280;
+			}
+
+			// 実際に表が使える最大横幅
+			const maxTableW = targetW - (margin * 2);
+
+			// 表の幅が最大幅を超える場合は縮小する
+			let scaleRatio = 1;
+			if (drawW > maxTableW) {
+				scaleRatio = maxTableW / drawW;
+			}
+
+			const finalTableW = drawW * scaleRatio;
+			const finalTableH = drawH * scaleRatio;
+			const targetH = finalTableH + (margin * 2); // 高さは内容に合わせて可変
+
+			const finalCanvas = document.createElement('canvas');
+			finalCanvas.width = targetW;
+			finalCanvas.height = targetH;
+			const ctx = finalCanvas.getContext('2d');
+
+			// 背景を白で塗りつぶす
+			ctx.fillStyle = "#ffffff";
+			ctx.fillRect(0, 0, targetW, targetH);
+
+			const offsetX = (targetW - finalTableW) / 2; // 中央揃え
+			const offsetY = margin;
+
+			ctx.drawImage(canvas, offsetX, offsetY, finalTableW, finalTableH);
+
+			const link = document.createElement("a");
+			link.href = finalCanvas.toDataURL("image/png");
+			link.download = "セットリスト.png";
+			link.click();
+		});
+
+		document.getElementById('export-csv-btn').addEventListener('click', () => {
+			if (tableData.length === 0) return;
+
+			let headers = [...selectedColumns];
+			if (showStatus) headers.push("ステータス");
+			if (showNote) headers.push("備考");
+			let csvContent = headers.join(",") + "\n";
+
+			tableData.forEach(item => {
+				if (item.type === 'section') {
+					csvContent += `"${(item.text || '').replace(/"/g, '""')}"\n`;
+				} else {
+					const cols = selectedColumns.map(col => `"${(item.originalData[col] || '').replace(/"/g, '""')}"`);
+					if (showStatus) cols.push(`"${item.status}"`);
+					if (showNote) cols.push(`"${item.note.replace(/"/g, '""')}"`);
+					csvContent += `${cols.join(",")}\n`;
+				}
+			});
+
+			const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = "セットリスト.csv";
+			link.click();
+		});
+
+		window.addEventListener('DOMContentLoaded', loadData);
+	</script>
+</body>
+
+</html>
