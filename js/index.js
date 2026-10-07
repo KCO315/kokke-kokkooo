@@ -46,21 +46,40 @@ function loadSettings() {
 // --- 画面切り替え制御 ---
 const navCsvBtn = document.getElementById('nav-csv-btn');
 const navPreviewBtn = document.getElementById('nav-preview-btn');
+const navSetlistBtn = document.getElementById('nav-setlist-btn');
 const frameCsv = document.getElementById('frame-csv');
 const framePreview = document.getElementById('frame-preview');
+const frameSetlist = document.getElementById('frame-setlist');
 
 navCsvBtn.addEventListener('click', () => {
 	navCsvBtn.classList.add('active');
 	navPreviewBtn.classList.remove('active');
+	navSetlistBtn.classList.remove('active');
 	frameCsv.style.display = 'block';
 	framePreview.style.display = 'none';
+	frameSetlist.style.display = 'none';
 });
 
 navPreviewBtn.addEventListener('click', () => {
 	navPreviewBtn.classList.add('active');
 	navCsvBtn.classList.remove('active');
+	navSetlistBtn.classList.remove('active');
 	frameCsv.style.display = 'none';
 	framePreview.style.display = 'block';
+	frameSetlist.style.display = 'none';
+});
+
+navSetlistBtn.addEventListener('click', () => {
+	navSetlistBtn.classList.add('active');
+	navCsvBtn.classList.remove('active');
+	navPreviewBtn.classList.remove('active');
+	frameCsv.style.display = 'none';
+	framePreview.style.display = 'none';
+	frameSetlist.style.display = 'block';
+
+	if (frameSetlist.contentWindow) {
+		frameSetlist.contentWindow.postMessage('tabOpened', '*');
+	}
 });
 
 // --- 初期設定モーダル制御 ---

@@ -755,6 +755,26 @@ folderInput.addEventListener('change', (event) => {
 	});
 	updateGroupNumbers(); folderInput.value = "";
 	lucide.createIcons({ root: listContainer });
+
+	const previewDataForSetlist = {
+		headers: ["グループ名", "サブグループ", "ファイル名"],
+		data: []
+	};
+	groupOrder.forEach(key => {
+		const groupInfo = groupsMap.get(key);
+		groupInfo.files.forEach(({ file, subGroupName }) => {
+			previewDataForSetlist.data.push({
+				"グループ名": groupInfo.mainGroupName,
+				"サブグループ": subGroupName || "",
+				"ファイル名": file.name
+			});
+		});
+	});
+	// サブグループが存在しない場合は列を減らす
+	if (!previewDataForSetlist.data.some(d => d["サブグループ"] !== "")) {
+		previewDataForSetlist.headers.splice(1, 1);
+	}
+	localStorage.setItem('kokekokkoPreviewData', JSON.stringify(previewDataForSetlist));
 });
 
 // グループ同士のドラッグ＆ドロップ処理

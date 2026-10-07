@@ -911,6 +911,21 @@ function resetCsvControlsToDummy() {
 			<span style="font-size: 11px; padding: 4px 10px; background-color: #e0f2ec; color: #007b5e; border-radius: 12px; border: 1px solid #b0d4c8;">カテゴリB</span>`;
 	}
 	lucide.createIcons({ root: csvControls });
+
+	// セトリ機能のためにCSVデータを保存 ---
+	localStorage.setItem('kokekokkoSetlistData', JSON.stringify({
+		headers: csvState.headers,
+		data: csvState.csvData
+	}));
 }
 
 lucide.createIcons();
+
+const originalUpdateCsvPreview = updateCsvPreview;
+updateCsvPreview = function () {
+	originalUpdateCsvPreview();
+	localStorage.setItem('kokekokkoSetlistData', JSON.stringify({
+		headers: csvState.headers,
+		data: csvState.csvData
+	}));
+};
